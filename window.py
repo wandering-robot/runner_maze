@@ -6,6 +6,8 @@ import pygame as py
 
 class Window:
     def __init__(self,height,width,cell_size):
+        self.running = True     #false if program terminated
+
         self.height = height
         self.width = width
         self.cell_size = cell_size          #all cells will be a square with a sidelength of this value
@@ -21,13 +23,21 @@ class Window:
 
     def update_screen(self):
         self.disp_win.blit(self.background,(0,0))
-        for cell in self.cell_dict:
-            self.disp_win.blit(cell.cell,self.state2cell(cell.coord))
+        for cell in self.cell_dict.values():
+            pixel = self.state2cell(cell.coord) #top left pixel
+            self.disp_win.blit(cell.cell,pixel)
+        py.display.flip()
 
-    @staticmethod
-    def state2cell(coord):
+    def state2cell(self,coord):
         """takes in the states coord and returns the cell's top left coord for blotting"""
         return coord[0] * self.cell_size, coord[1] * self.cell_size
+
+    ###main method to run this thing###
+    def run(self):
+        """method to run the program."""
+        while self.running:
+            self.update_screen()
+            self.handler.handle()
 
 class CreateWindow(Window):
     def __init__(self,height,width,cell_size):

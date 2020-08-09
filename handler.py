@@ -1,6 +1,8 @@
 """Each window will have their own event handler. The event's/actions they do/take
 depend on if the program is creating or showing"""
 
+import pygame as py
+
 class Handler:
     def __init__(self,window):
         self.window = window
@@ -8,10 +10,10 @@ class Handler:
 
         #shutting down the program
     def stop_running(self):
+        self.window.running = False
         py.quit()
     
-    @staticmethod
-    def cell2state(pos):
+    def cell2state(self,pos):
         """Converts the mouse pos to the appropriate state"""
         return pos[0]//self.cell_size, pos[1]//self.cell_size
 
@@ -34,6 +36,7 @@ class CreateHandler(Handler):
                 else:
                     print("Error: Must have a start and finish")
             elif event.type == py.MOUSEBUTTONDOWN:
+                print(self.cell2state(py.mouse.get_pos()))
                 if event.button == 1:
                     self.wall_maker_mode = True
                 elif event.button == 3:
@@ -53,36 +56,30 @@ class CreateHandler(Handler):
         elif self.wall_delete_mode:
             self.delete_wall()
 
-    #create a wall to block the maze runner from the mouse position
+    def change_cell(self,pos,purpose):
+        """main method to change a cell's purpose"""
+        coord = self.cell2state(pos)
+        try:
+            self.window.cell_dict[coord].assign_purpose(purpose)                
+        except:
+            pass
+
     def create_wall(self):
+        """create a wall to block the maze runner from the mouse position"""
         pos = py.mouse.get_pos()
-        try:
-            a = 'wall'                   ###ToDo: determine how to change walls
-        except:
-            pass
+        self.change_cell(pos,'wall')
 
-    #delete a wall from the mouse position
     def delete_wall(self):
+        """delete a wall from the mouse position"""
         pos = py.mouse.get_pos()
-        try:
-            a = None                   ###ToDo: determine how to change walls
-        except:
-            pass
+        self.change_cell(pos,None)
 
-    #create the starting point for the maze runner from the mouse position
     def make_start(self):
+        """create the starting point for the maze runner from the mouse position"""
         pos = py.mouse.get_pos()
-        try:
-            a = 'start'                   ###ToDo: determine how to change walls
-            self.made_start = True
-        except:
-            pass
+        self.change_cell(pos,'start')
 
-    #create the finish line for the maze runner from the mouse position
     def make_finish(self):
+        """create the finish line for the maze runner from the mouse position"""
         pos = py.mouse.get_pos()
-        try:
-            a = 'finish'                   ###ToDo: determine how to change walls
-            self.made_finish = True
-        except:
-            pass
+        self.change_cell(pos,'finish')

@@ -11,12 +11,15 @@ class State:
         self.purpose = None
         self.reward = None
 
+    def __repr__(self):
+        return f'SC@{self.coord}'
 
     def add_visuals(self,size):
         """Method run to add the cell aspects to each state. Mostly to tell them what size they are"""
         py.init()           #check to see if I still need this later
         self.size = size
         self.cell = py.Surface((self.size,self.size)).convert()
+        self.cell.fill(self.colour)
 
 
     def asssign_purpose(self,role):
@@ -31,4 +34,4 @@ class State:
             self.colour = (255,0,0)
         else:
             self.reward = -1
-            self.colour = (0,0,100)
+            self.colour = (0,100,0)

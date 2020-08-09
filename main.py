@@ -5,9 +5,8 @@ from maze import Maze
 
 class Main:
     def __init__(self,new=True):
-        self.running = True     #not true if program terminated
         if new:
-            self.cell_col_num = 10                  #number of cells that will span the width of the window
+            self.cell_col_num = 5                  #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
             
             self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
@@ -23,7 +22,9 @@ class Main:
         else:
             #ToDo: Need to load a pre-exisiting maze with sizes
             raise Exception('Not capable of loading pre-built mazes yet')
-        
+
+        #run the program
+        self.window.run()
 
     def create_maze(self):
         """This method will be the main one run when in creative mode. Called when new = True"""

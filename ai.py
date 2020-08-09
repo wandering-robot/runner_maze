@@ -20,6 +20,7 @@ class AI:
         self.episode_num = 0            #to keep track of what episode we are currently on while training
 
     def run_episode(self):
+        """preforms algorithm, stops once hits terminal, returns steps taken to hit terminal"""
         steps = 0
         state = self.starting_state
         while True:
@@ -28,7 +29,7 @@ class AI:
             steps += 1
             state = self.algorithm(state)
         self.episode_num += 1
-        print(f'Episode {self.episode_num} took {steps} steps')
+        return steps
 
     def algorithm(self,state):
         """preforms the ML algorithm, returning the next state"""

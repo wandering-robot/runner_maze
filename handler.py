@@ -89,3 +89,21 @@ class CreateHandler(Handler):
         pos = py.mouse.get_pos()
         self.change_cell(pos,'finish')
         self.made_finish = True
+
+class RunningHandler(Handler):
+    """handler for the learning portion of the program."""
+    def __init__(self,window):
+        super().__init__(window)
+
+    def handle(self):
+        """S saves the knowledge, return stops learning. Will return 'finished' if user decideds that it is smart enough"""
+        for event in py.event.get():    
+            if event.type == py.QUIT:
+                self.window.running = False
+                py.quit()
+                break
+            elif event.type == py.KEYDOWN:
+                if event.key == py.K_s:
+                    self.window.save_knowledge()
+                if event.key == py.K_RETURN:
+                    return 'finished'

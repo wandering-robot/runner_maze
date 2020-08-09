@@ -21,12 +21,12 @@ class Main:
             self.window = CreateWindow(self.height,self.width,self.cell_size)
 
             self.create_maze()
+
+            self.window.start_drawing()
         else:
             #ToDo: Need to load a pre-exisiting maze with sizes
             raise Exception('Not capable of loading pre-built mazes yet')
 
-        #run the program
-        self.window.run()
 
     def create_maze(self):
         """This method will be the main one run when in creative mode. Called when new = True"""

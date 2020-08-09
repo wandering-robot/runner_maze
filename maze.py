@@ -9,16 +9,15 @@ class Maze:
         self.col_num = col_num
         self.row_num = row_num
 
-        self.state_dict = self.make_state_dict()            #key = coord tup, value = State
+        self.state_dict = None
 
     def make_state_dict(self):
         """state dictionary will allow all states to be accessed by their coord tup"""
-        state_dict = {}
+        self.state_dict = {}
         for j in range(self.row_num):
             for i in range(self.col_num):
                 s = State(i,j)
-                state_dict[(i,j)] = s
-                s.asssign_purpose(None)
+                self.state_dict[(i,j)] = s
+                s.assign_purpose(None)
 
-        return state_dict
         

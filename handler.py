@@ -29,14 +29,13 @@ class CreateHandler(Handler):
         self.made_finish = False
 
     def handle(self):
+        """clicking the mouse allows you to draw or delete blocks, pressing s or f create start
+        and finishing blocks respectively, and pressing enter makes the program stop drawing and 
+        start learning"""
         for event in py.event.get():    
             if event.type == py.QUIT:
-                if self.made_start and self.made_finish:    #ensure start and finish are made
-                    self.stop_running()
-                else:
-                    print("Error: Must have a start and finish")
+                self.stop_running()
             elif event.type == py.MOUSEBUTTONDOWN:
-                print(self.cell2state(py.mouse.get_pos()))
                 if event.button == 1:
                     self.wall_maker_mode = True
                 elif event.button == 3:
@@ -51,6 +50,10 @@ class CreateHandler(Handler):
                     self.make_start()
                 elif event.key == py.K_f:
                     self.make_finish()
+                elif event.key == py.K_RETURN:      #STOP DRAWING AND START LEARNING
+                    if self.made_start and self.made_finish:    #ensure start and finish are made
+                        self.window.start_learning()
+
         if self.wall_maker_mode:
             self.create_wall()
         elif self.wall_delete_mode:
@@ -78,8 +81,11 @@ class CreateHandler(Handler):
         """create the starting point for the maze runner from the mouse position"""
         pos = py.mouse.get_pos()
         self.change_cell(pos,'start')
+        self.made_start = True
+        self.window.starting_state_coord = self.cell2state(pos)
 
     def make_finish(self):
         """create the finish line for the maze runner from the mouse position"""
         pos = py.mouse.get_pos()
         self.change_cell(pos,'finish')
+        self.made_finish = True

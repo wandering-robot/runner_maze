@@ -16,6 +16,8 @@ class Main:
             self.optomize_sizes()
 
             self.maze = Maze(self.cell_col_num,self.cell_row_num)
+            self.maze.make_state_dict()
+
             self.window = CreateWindow(self.height,self.width,self.cell_size)
 
             self.create_maze()

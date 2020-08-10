@@ -14,13 +14,16 @@ class State:
     def __repr__(self):
         return f'SC@{self.coord}'
 
-    def add_visuals(self,size):
+    def add_visuals(self,size=None):
         """Method run to add the cell aspects to each state. Mostly to tell them what size they are"""
         py.init()           #check to see if I still need this later
-        self.size = size
+        if size != None:    #needed because I use this function to also resurface the cells
+            self.size = size
         self.cell = py.Surface((self.size,self.size)).convert()
         self.cell.fill(self.colour)
 
+    def desurface(self):
+        self.cell = None
 
     def assign_purpose(self,role):
         """given a user-inputted role (just another word for purpose) update the state's

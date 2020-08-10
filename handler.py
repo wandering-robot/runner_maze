@@ -52,7 +52,8 @@ class CreateHandler(Handler):
                     self.make_finish()
                 elif event.key == py.K_RETURN:      #STOP DRAWING AND START LEARNING
                     if self.made_start and self.made_finish:    #ensure start and finish are made
-                        self.window.start_learning()
+                        # self.window.start_learning()
+                        self.window.drawing = False
 
         if self.wall_maker_mode:
             self.create_wall()

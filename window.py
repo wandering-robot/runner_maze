@@ -2,13 +2,18 @@
 These visuals pertain to the drawing of the maze as well as the 
 showing of the agent's body completing the maze using q-values"""
 from handler import CreateHandler, RunningHandler
+from ai import AI, Knowledge
+
 import pygame as py
-from ai import AI
+import pickle           #to save an AI's knowledge
+from pathlib import Path    #to make a file path to save the knowledge to
+import os       #same as pathlib
 
 class Window:
-    def __init__(self,height,width,cell_size):
+    def __init__(self,main,height,width,cell_size):
         self.running = True     #false if program terminated
 
+        self.main = main
         self.height = height
         self.width = width
         self.cell_size = cell_size          #all cells will be a square with a sidelength of this value
@@ -43,30 +48,32 @@ class Window:
         return coord[0] * self.cell_size, coord[1] * self.cell_size
 
 class CreateWindow(Window):
-    def __init__(self,height,width,cell_size):
-        super().__init__(height,width,cell_size)
+    def __init__(self,main,height,width,cell_size):
+        super().__init__(main,height,width,cell_size)
 
         self.handler = CreateHandler(self)
 
     def start_drawing(self):
         """method to run the drawing aspect of the program."""
-        while self.running:
+        self.drawing = True
+        while self.drawing:
             self.update_screen()
-            self.handler.handle()
+            self.handler.handle() 
 
     def start_learning(self):
         """method that commences with the AI's learning, showing current results on screen"""
-        ai = AI(self)
+        self.ai = AI(self)
         self.handler = RunningHandler(self)
 
-        i = 0
         while self.running:
-            steps = ai.run_episode()
-            i += 1
-            if i % 20 == 0:
-                self.progress_screen(i,steps)
+            steps = self.ai.run_episode()
+            ep_num = self.ai.episode_num
+            if ep_num % 20 == 0:
+                self.progress_screen(ep_num,steps)
             status = self.handler.handle()
             if status == 'finished':
+                for q in self.ai.qs.values():
+                    q.state.add_visuals()
                 break
 
     def progress_screen(self,ep_num,steps):
@@ -81,4 +88,17 @@ class CreateWindow(Window):
         py.display.flip()
 
     def save_knowledge(self):
-        pass
+        """creates a knowledge class to be pickeled"""
+        ep_num = self.ai.episode_num
+        qs = self.ai.qs
+        for q in qs.values():
+            state = q.state
+            state.desurface()
+        knowledge = Knowledge(qs,ep_num)
+
+        if not Path(self.main.maze_name).exists():
+            Path(self.main.maze_name).mkdir()
+        filename = Path(self.main.maze_name)/ f'{self.main.maze_name}_knowledge_{ep_num}'
+        outfile = open(filename,'wb')
+        pickle.dump(knowledge,outfile)
+        outfile.close()

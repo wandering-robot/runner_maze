@@ -15,14 +15,16 @@ class Main:
 
             self.optomize_sizes()
 
+            self.maze_name = input('Please name the maze:\t')
             self.maze = Maze(self.cell_col_num,self.cell_row_num)
             self.maze.make_state_dict()
 
-            self.window = CreateWindow(self.height,self.width,self.cell_size)
+            self.window = CreateWindow(self,self.height,self.width,self.cell_size)
 
             self.create_maze()
 
-            self.window.start_drawing()
+            self.window.start_drawing() #start drawing here, window called to start learning in handler
+            self.window.start_learning()
         else:
             #ToDo: Need to load a pre-exisiting maze with sizes
             raise Exception('Not capable of loading pre-built mazes yet')

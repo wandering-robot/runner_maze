@@ -1,14 +1,16 @@
 """AI algorithms for learning how to solve the maze"""
 from random import randint,choice
+import pygame as py
 
 from state import State, Q
 class AI:
+    """object that learns from trial and error using RL algorithms"""
     def __init__(self,window):
         self.window = window
         self.starting_state = self.window.cell_dict[self.window.starting_state_coord]
 
         self.states = self.window.cell_dict
-        self.actions = [(right,down) for right in range(-1,2) for down in range(-1,2) if (right,down) != (0,0)]
+        self.actions = self.create_actions()
         
         self.qs = {}
         self.create_qs()
@@ -42,6 +44,10 @@ class AI:
         q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
 
         return state_prime
+
+    def create_actions(self):
+        """creates list of all actions that AI can take"""
+        return [(right,down) for right in range(-1,2) for down in range(-1,2) if (right,down) != (0,0)]
 
     def create_qs(self):
         """fill the qs dict with the state;s coord and the action as a Q's key"""
@@ -85,3 +91,45 @@ class Knowledge:
     def __init__(self,qs,episode):
         self.qs = qs
         self.episode = episode
+
+class Runner(AI):
+    """object that solves a maze using previously generated knowledge"""
+    def __init__(self,window):
+        self.window = window
+        self.knowledge_list = self.window.knowledge
+        self.size = self.window.cell_size
+        self.colour = (255,0,255)
+
+        self.starting_state = self.window.starting_state
+        self.states = self.window.cell_dict
+        self.actions = super().create_actions()
+        self.epsilon = 0
+
+        py.init()
+        self.body = py.Surface((self.size,self.size)).convert()
+        self.body.fill(self.colour)
+
+        self.pos = self.starting_state.coord
+        self.i = 0
+        self.knowledge = self.knowledge_list[self.i]
+        self.qs = self.knowledge.qs
+
+    def next_knowledge(self):
+        """solve maze based on next knowledge iteration"""
+        self.iter += 1
+        self.qs = self.knowledge_list[iter].qs
+
+    def move(self):
+        """process of moving avatar to next state based on it's current maze knowledge"""
+        state = self.window.cell_dict[self.pos]
+        action = super().get_action(state)
+        state_prime, reward = super().next_state_reward(state,action)
+        self.show_damage(state,state_prime)
+        self.pos = state_prime.coord
+
+    def show_damage(self,state,state_prime):
+        if state == state_prime:
+            self.colour = (255,0,0)
+        else:
+            self.colour = (255,0,255)
+        self.body.fill(self.colour)

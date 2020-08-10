@@ -6,7 +6,7 @@ class State:
     def __init__(self,row,col):
         self.col = col
         self.row = row
-        self.coord = (row,col)              #state coord is row,col 
+        self.coord = (row,col)              
 
         self.purpose = None
         self.reward = None
@@ -23,6 +23,7 @@ class State:
         self.cell.fill(self.colour)
 
     def desurface(self):
+        """remove Surface from cell/state so that it can be pickled and saved"""
         self.cell = None
 
     def assign_purpose(self,role):
@@ -34,7 +35,7 @@ class State:
             self.colour = (0,0,0)
         elif role == 'finish':
             self.reward = 5
-            self.colour = (255,0,0)
+            self.colour = (0,0,255)
         elif role == 'start':
             self.reward = -1
             self.colour = (255,255,0)

@@ -2,12 +2,14 @@
 These visuals pertain to the drawing of the maze as well as the 
 showing of the agent's body completing the maze using q-values"""
 from handler import CreateHandler, RunningHandler, ShowingHandler
-from ai import AI, Knowledge
+from ai import AI, Knowledge, Runner
 
 import pygame as py
 import pickle           #to save an AI's knowledge
 from pathlib import Path    #to make a file path to save the knowledge to
 import os       #same as pathlib
+from time import sleep #to slow down the showing window   
+
 
 class Window:
     def __init__(self,main,height,width,cell_size,retain_window=None):  #retain window lets code carryover the old window for displaying so that it doesn't close/reopen
@@ -29,8 +31,6 @@ class Window:
             self.disp_win = retain_window
         self.background = py.Surface(self.disp_win.get_size()).convert()
         self.background.fill((255,255,255))
-        py.font.init()
-        self.myfont = py.font.SysFont('Comic Sans MS',30)
 
     def update_screen(self):
         """blits all the cells and the ai' avatar onto disp_win"""
@@ -41,9 +41,9 @@ class Window:
             pixel = self.state2cell(cell.coord) #top left pixel
             self.disp_win.blit(cell.cell,pixel)
         #blit the AI's avatar (if there is one, won't be in drawing mode)
-        if self.avatar != None:                                                 #ToDo: Create avatar that follows these specs
-            pixel = self.state2cell(self.avatar.coord)
-            self.disp_win.blit(avatar.body,pixel)
+        if self.avatar != None:                                                 
+            pixel = self.state2cell(self.avatar.pos)
+            self.disp_win.blit(self.avatar.body,pixel)
         py.display.flip()
 
     def state2cell(self,coord):
@@ -53,7 +53,8 @@ class Window:
 class CreateWindow(Window):
     def __init__(self,main,height,width,cell_size):
         super().__init__(main,height,width,cell_size)
-
+        py.font.init()
+        self.myfont = py.font.SysFont('Comic Sans MS',30)
         self.handler = CreateHandler(self)
 
     def start_drawing(self):
@@ -119,20 +120,40 @@ class ShowWindow(Window):
     def __init__(self,main,height,width,cell_size,retain_window=None,maze_name=None):
         super().__init__(main,height,width,cell_size,retain_window)
 
-        self.handler = ShowingHandler(self)
-        #get maze name
+        py.font.init()
+        self.myfont = py.font.SysFont('Comic Sans MS',20)
+
+        #get maze and name
         if maze_name == None:
             self.maze_name = self.get_maze_name()
+            self.maze = self.load_maze()
         else:
             self.maze_name = maze_name
-        #load maze layout and resurface all the states
-        self.maze = self.load_maze()
-        for state in self.maze.state_dict.values(): #resurface all the states
-            state.add_visuals()
+            self.maze = self.main.maze
+
+        self.cell_dict = self.maze.state_dict
+        self.starting_state = None
+        self.resurface_states(self.maze.state_dict.values())
+
         #load knowledge iterations and sort them in ascending order
         self.knowledge = self.load_knowledge()
-        self.sort_knowledge()
 
+        self.handler = ShowingHandler(self)
+        self.avatar = Runner(self)
+
+    def show(self):
+        while self.running:
+            self.update_screen()
+            self.blit_episode_num()
+            self.avatar.move()
+            self.handler.handle()
+            sleep(0.5)
+
+    def blit_episode_num(self):
+        text = f'Episode #{self.avatar.knowledge.episode}'
+        text_surface = self.myfont.render(text,False,(0,0,0),(255,255,255))
+        self.disp_win.blit(text_surface,(4*self.width/5 - 45,15))
+        py.display.flip()
 
     def load_maze(self):
         """loads the maze object from name_maze file"""
@@ -153,11 +174,9 @@ class ShowWindow(Window):
             infile = open(Path(self.maze_name) / f,'rb')
             iter_knowledge.append(pickle.load(infile))
             infile.close()
+        iter_knowledge.sort(key= lambda i: i.episode)
+
         return iter_knowledge
-
-
-    def sort_knowledge(self):
-        self.knowledge.sort(key= lambda i: i.episode)
 
     def get_maze_name(self):
         """gets maze name from user and ensures that it exists"""
@@ -168,3 +187,11 @@ class ShowWindow(Window):
             else:
                 print('Maze not found, please re-input')
         return maze_name
+
+    #starting state set in this method
+    def resurface_states(self,state_dict):
+        """resurfaces all the states in a dictionary, also ascribes starting state to self"""
+        for state in state_dict:
+            state.add_visuals()
+            if state.purpose == 'start':
+                self.starting_state = state

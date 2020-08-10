@@ -3,14 +3,18 @@
 from window import CreateWindow, ShowWindow
 from maze import Maze
 
+import pickle       #for loading old mazes
+from pathlib import Path
+
 class Main:
     def __init__(self,new=True):
+        self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
+        self.width = 500   
+
         if new:
             self.cell_col_num = 5                  #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
-            
-            self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
-            self.width = 500                      
+                               
             self.cell_size = self.calc_cell_size()
 
             self.optomize_sizes()
@@ -27,12 +31,33 @@ class Main:
 
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
-            self.window.load_iters()
-
+            self.window.show()
         else:
-            #ToDo: Need to load a pre-exisiting maze with sizes
-            raise Exception('Not capable of loading pre-built mazes yet')
+            self.maze = self.load_maze()
+            #make main object have similar attributes in both new and old cases for consistency
+            self.cell_size = self.maze.cell_size
+            self.cell_col_num = self.maze.col_num
+            self.cell_row_num = self.maze.row_num
 
+            self.optomize_sizes()
+
+            self.window = ShowWindow(self,self.height,self.width,self.cell_size,maze_name=self.maze_name)
+            self.window.show()
+
+
+    def load_maze(self):
+        """loads the maze object from name_maze file"""
+        while True:
+            self.maze_name = input('Please name the maze:\t')  
+            try:
+                filename = Path(self.maze_name,f'{self.maze_name}_maze')
+                infile = open(filename,'rb')
+                maze = pickle.load(infile)
+                infile.close()
+                break
+            except:
+                print('File not found, please re-input:\t')
+        return maze
 
     def create_maze(self):
         """This method will be the main one run when in creative mode. Called when new = True"""
@@ -66,4 +91,6 @@ class Main:
 
 
 if __name__ == "__main__":
-    main = Main()
+    user = input('[N]ew file or [L]oad?').lower()
+    status = not user == 'l'
+    main = Main(new=status)

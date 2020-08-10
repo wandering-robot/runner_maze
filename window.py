@@ -48,7 +48,7 @@ class Window:
 
     def state2cell(self,coord):
         """takes in the states coord and returns the cell's top left coord for blotting"""
-        return coord[0] * self.cell_size, coord[1] * self.cell_size
+        return coord[1] * self.cell_size, coord[0] * self.cell_size
 
 class CreateWindow(Window):
     def __init__(self,main,height,width,cell_size):

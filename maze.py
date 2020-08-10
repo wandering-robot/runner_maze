@@ -15,10 +15,10 @@ class Maze:
     def make_state_dict(self):
         """state dictionary will allow all states to be accessed by their coord tup"""
         self.state_dict = {}
-        for j in range(self.row_num):
-            for i in range(self.col_num):
-                s = State(i,j)
-                self.state_dict[(i,j)] = s
+        for row in range(self.row_num):
+            for col in range(self.col_num):
+                s = State(row,col)
+                self.state_dict[(row,col)] = s
                 s.assign_purpose(None)
 
         

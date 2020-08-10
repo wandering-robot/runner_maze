@@ -54,3 +54,6 @@ class Q:
         self.action = action
 
         self.value = 0
+
+    def __repr__(self):
+        return f'{self.value}'

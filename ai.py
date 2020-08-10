@@ -47,7 +47,7 @@ class AI:
 
     def create_actions(self):
         """creates list of all actions that AI can take"""
-        return [(right,down) for right in range(-1,2) for down in range(-1,2) if (right,down) != (0,0)]
+        return [(del_row,del_col) for del_row in range(-1,2) for del_col in range(-1,2) if (del_row,del_col) != (0,0)]
 
     def create_qs(self):
         """fill the qs dict with the state;s coord and the action as a Q's key"""
@@ -84,7 +84,7 @@ class AI:
             else:
                 return state_prime, reward
         except:
-            return state, -1            #assign -1 reward when goes off map, essentially surroounded by walls
+            return state, -5            #assign -1 reward when goes off map, essentially surroounded by walls
 
 class Knowledge:
     """will use for saving the AI's knowledge of a specific map"""
@@ -146,6 +146,7 @@ class Runner(AI):
             self.quit_iter()
 
     def show_damage(self,state,state_prime):
+        """make the avatar red when it runs in to a wall"""
         if state == state_prime:
             self.colour = (255,0,0)
         else:

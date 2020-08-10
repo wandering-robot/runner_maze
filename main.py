@@ -15,7 +15,8 @@ class Main:
         self.autosave = autosave        #so that can automatically save if i want   
 
         if new:
-            self.cell_col_num = 4                  #number of cells that will span the width of the window
+            self.cell_col_num = 3
+                              #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
                                
             self.cell_size = self.calc_cell_size()

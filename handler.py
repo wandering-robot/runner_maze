@@ -15,7 +15,7 @@ class Handler:
     
     def cell2state(self,pos):
         """Converts the mouse pos to the appropriate state"""
-        return pos[0]//self.cell_size, pos[1]//self.cell_size
+        return pos[1]//self.cell_size, pos[0]//self.cell_size
 
 class CreateHandler(Handler):
     def __init__(self,window):

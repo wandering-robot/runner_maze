@@ -1,6 +1,6 @@
 """Main section of code to run all the functions and methods"""
 
-from window import CreateWindow
+from window import CreateWindow, ShowWindow
 from maze import Maze
 
 class Main:
@@ -16,15 +16,19 @@ class Main:
             self.optomize_sizes()
 
             self.maze_name = input('Please name the maze:\t')
-            self.maze = Maze(self.cell_col_num,self.cell_row_num)
+            self.maze = Maze(self.cell_col_num,self.cell_row_num,self.cell_size)
             self.maze.make_state_dict()
 
+            #creating section
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
-
             self.create_maze()
-
             self.window.start_drawing() #start drawing here, window called to start learning in handler
             self.window.start_learning()
+
+            #showing section
+            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win)
+            
+
         else:
             #ToDo: Need to load a pre-exisiting maze with sizes
             raise Exception('Not capable of loading pre-built mazes yet')

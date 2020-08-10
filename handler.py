@@ -96,7 +96,8 @@ class RunningHandler(Handler):
         super().__init__(window)
 
     def handle(self):
-        """S saves the knowledge, return stops learning. Will return 'finished' if user decideds that it is smart enough"""
+        """S saves the knowledge and maze_layout, return stops learning. Will return 'finished' if user decideds that it is smart enough"""
+        maze_saved = False
         for event in py.event.get():    
             if event.type == py.QUIT:
                 self.window.running = False
@@ -105,5 +106,23 @@ class RunningHandler(Handler):
             elif event.type == py.KEYDOWN:
                 if event.key == py.K_s:
                     self.window.save_knowledge()
+                    if not maze_saved:
+                        self.window.save_maze()
+                        maze_saved = True
                 if event.key == py.K_RETURN:
                     return 'finished'
+
+class ShowingHandler(Handler):
+    """handler for the showing portion of the program."""
+    def __init__(self,window):
+        super().__init__(window)
+
+    def handle(self):
+        for event in py.event.get():    
+            if event.type == py.QUIT:
+                self.window.running = False
+                py.quit()
+                break
+            elif event.type == py.KEYDOWN:
+                if event.key == py.K_RETURN:
+                    pass                        #ToDo: make this switch to the next iteration of saved knowledge

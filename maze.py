@@ -5,9 +5,10 @@ moving onto a cell/state of that type"""
 from state import State
 
 class Maze:
-    def __init__(self,col_num,row_num):
+    def __init__(self,col_num,row_num,cell_size):
         self.col_num = col_num
         self.row_num = row_num
+        self.cell_size = cell_size
 
         self.state_dict = None
 

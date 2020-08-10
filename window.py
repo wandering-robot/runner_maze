@@ -1,7 +1,7 @@
 """Window class will host the program and show all visuals.
 These visuals pertain to the drawing of the maze as well as the 
 showing of the agent's body completing the maze using q-values"""
-from handler import CreateHandler, RunningHandler
+from handler import CreateHandler, RunningHandler, ShowingHandler
 from ai import AI, Knowledge
 
 import pygame as py
@@ -10,7 +10,7 @@ from pathlib import Path    #to make a file path to save the knowledge to
 import os       #same as pathlib
 
 class Window:
-    def __init__(self,main,height,width,cell_size):
+    def __init__(self,main,height,width,cell_size,retain_window=None):  #retain window lets code carryover the old window for displaying so that it doesn't close/reopen
         self.running = True     #false if program terminated
 
         self.main = main
@@ -23,7 +23,10 @@ class Window:
 
         #pygame stuff
         py.init()
-        self.disp_win = py.display.set_mode((self.width,self.height))
+        if retain_window == None:
+            self.disp_win = py.display.set_mode((self.width,self.height))
+        else:
+            self.disp_win = retain_window
         self.background = py.Surface(self.disp_win.get_size()).convert()
         self.background.fill((255,255,255))
         py.font.init()
@@ -96,9 +99,26 @@ class CreateWindow(Window):
             state.desurface()
         knowledge = Knowledge(qs,ep_num)
 
+        #save knowledge to file name_knowledge_number
         if not Path(self.main.maze_name).exists():
             Path(self.main.maze_name).mkdir()
         filename = Path(self.main.maze_name)/ f'{self.main.maze_name}_knowledge_{ep_num}'
         outfile = open(filename,'wb')
         pickle.dump(knowledge,outfile)
         outfile.close()
+
+    def save_maze(self):
+        #save maze layout
+        if not Path(self.main.maze_name,f'{self.main.maze_name}_maze').exists():
+            maze_file = Path(self.main.maze_name,f'{self.main.maze_name}_maze')
+            outfile = open(maze_file,'wb')
+            pickle.dump(self.main.maze,outfile)
+            outfile.close()
+
+class ShowWindow(Window):
+    def __init__(self,main,height,width,cell_size,retain_window=None):
+        super().__init__(main,height,width,cell_size,retain_window)
+
+        self.handler = ShowingHandler(self)
+        print(a)
+

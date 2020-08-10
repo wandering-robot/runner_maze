@@ -5,6 +5,8 @@ from maze import Maze
 
 import pickle       #for loading old mazes
 from pathlib import Path
+from shutil import rmtree   #to delete a preexisitng file if user wants to name a new maze by an old name
+import sys      #to exit if user 
 
 class Main:
     def __init__(self,new=True,autosave=None):
@@ -20,7 +22,7 @@ class Main:
 
             self.optomize_sizes()
 
-            self.maze_name = input('Please name the maze:\t')
+            self.maze_name = self.get_maze_name()
             self.maze = Maze(self.cell_col_num,self.cell_row_num,self.cell_size)
             self.maze.make_state_dict()
 
@@ -28,7 +30,7 @@ class Main:
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
             self.create_maze()
             self.window.start_drawing() #start drawing here, window called to start learning in handler
-            self.window.start_learning(autosave=20)
+            self.window.start_learning(autosave=autosave)
 
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
@@ -45,6 +47,23 @@ class Main:
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,maze_name=self.maze_name)
             self.window.show()
 
+    def get_maze_name(self):
+        """gets name from user, if already been used, has user delete old file"""
+        while True:
+            maze_name = input('Please name the maze:\t')
+            if Path(maze_name).exists():
+                valid = False
+                while not valid:
+                    delete = input("Maze already exists. Overwrite? y/n:\t").lower()
+                    valid = (delete =='y' or delete == 'n')
+                    if not valid:
+                        print('Error, expecting y or n\n')
+                if delete == 'y':
+                    rmtree(Path(maze_name), ignore_errors=True)
+                    break
+            else:
+                break
+        return maze_name
 
     def load_maze(self):
         """loads the maze object from name_maze file"""

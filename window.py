@@ -116,8 +116,55 @@ class CreateWindow(Window):
             outfile.close()
 
 class ShowWindow(Window):
-    def __init__(self,main,height,width,cell_size,retain_window=None):
+    def __init__(self,main,height,width,cell_size,retain_window=None,maze_name=None):
         super().__init__(main,height,width,cell_size,retain_window)
 
         self.handler = ShowingHandler(self)
+        #get maze name
+        if maze_name == None:
+            self.maze_name = self.get_maze_name()
+        else:
+            self.maze_name = maze_name
+        #load maze layout and resurface all the states
+        self.maze = self.load_maze()
+        for state in self.maze.state_dict.values(): #resurface all the states
+            state.add_visuals()
+        #load knowledge iterations and sort them in ascending order
+        self.knowledge = self.load_knowledge()
+        self.sort_knowledge()
 
+
+    def load_maze(self):
+        """loads the maze object from name_maze file"""
+        filename = Path(self.maze_name,f'{self.maze_name}_maze')
+        infile = open(filename,'rb')
+        maze = pickle.load(infile)
+        infile.close()
+        return maze
+
+    def load_knowledge(self):
+        """returns a list of knowledge"""
+        iter_files = [f for f in os.listdir(Path(self.maze_name))]
+        for i, f in enumerate(iter_files):
+            if not f[-1].isnumeric():         #gets rid of the maze layout file
+                del iter_files[i]
+        iter_knowledge = []
+        for f in iter_files:
+            infile = open(Path(self.maze_name) / f,'rb')
+            iter_knowledge.append(pickle.load(infile))
+            infile.close()
+        return iter_knowledge
+
+
+    def sort_knowledge(self):
+        self.knowledge.sort(key= lambda i: i.episode)
+
+    def get_maze_name(self):
+        """gets maze name from user and ensures that it exists"""
+        while True:
+            maze_name = input('Input maze_name to load:\t')
+            if Path(maze_name).exists(): 
+                break
+            else:
+                print('Maze not found, please re-input')
+        return maze_name

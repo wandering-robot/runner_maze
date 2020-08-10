@@ -26,8 +26,8 @@ class Main:
             self.window.start_learning()
 
             #showing section
-            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win)
-            
+            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
+            self.window.load_iters()
 
         else:
             #ToDo: Need to load a pre-exisiting maze with sizes

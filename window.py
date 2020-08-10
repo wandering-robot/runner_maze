@@ -120,5 +120,4 @@ class ShowWindow(Window):
         super().__init__(main,height,width,cell_size,retain_window)
 
         self.handler = ShowingHandler(self)
-        print(a)
 

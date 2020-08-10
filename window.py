@@ -64,7 +64,7 @@ class CreateWindow(Window):
             self.update_screen()
             self.handler.handle() 
 
-    def start_learning(self):
+    def start_learning(self,autosave=None):
         """method that commences with the AI's learning, showing current results on screen"""
         self.ai = AI(self)
         self.handler = RunningHandler(self)
@@ -75,6 +75,9 @@ class CreateWindow(Window):
             if ep_num % 20 == 0:
                 self.progress_screen(ep_num,steps)
             status = self.handler.handle()
+            if autosave != None:
+                if ep_num % autosave == 0:
+                    self.save_knowledge()
             if status == 'finished':
                 for q in self.ai.qs.values():
                     q.state.add_visuals()

@@ -7,12 +7,13 @@ import pickle       #for loading old mazes
 from pathlib import Path
 
 class Main:
-    def __init__(self,new=True):
+    def __init__(self,new=True,autosave=None):
         self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
-        self.width = 500   
+        self.width = 500
+        self.autosave = autosave        #so that can automatically save if i want   
 
         if new:
-            self.cell_col_num = 10                  #number of cells that will span the width of the window
+            self.cell_col_num = 4                  #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
                                
             self.cell_size = self.calc_cell_size()
@@ -27,7 +28,7 @@ class Main:
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
             self.create_maze()
             self.window.start_drawing() #start drawing here, window called to start learning in handler
-            self.window.start_learning()
+            self.window.start_learning(autosave=20)
 
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
@@ -93,4 +94,5 @@ class Main:
 if __name__ == "__main__":
     user = input('[N]ew file or [L]oad?\t').lower()
     status = not user == 'l'
-    main = Main(new=status)
+    main = Main(new=status,autosave=100)
+

@@ -12,7 +12,7 @@ class Main:
         self.width = 500   
 
         if new:
-            self.cell_col_num = 5                  #number of cells that will span the width of the window
+            self.cell_col_num = 10                  #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
                                
             self.cell_size = self.calc_cell_size()
@@ -91,6 +91,6 @@ class Main:
 
 
 if __name__ == "__main__":
-    user = input('[N]ew file or [L]oad?').lower()
+    user = input('[N]ew file or [L]oad?\t').lower()
     status = not user == 'l'
     main = Main(new=status)

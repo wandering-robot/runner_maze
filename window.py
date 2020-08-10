@@ -142,14 +142,19 @@ class ShowWindow(Window):
         self.avatar = Runner(self)
 
     def show(self):
+        self.wait_time = 0.25
         while self.running:
             self.update_screen()
             self.blit_episode_num()
             self.avatar.move()
-            self.handler.handle()
-            sleep(0.5)
+            try:
+                self.handler.handle()       #so that doesn't error out if completed
+            except:
+                pass
+            sleep(self.wait_time)
 
     def blit_episode_num(self):
+        """method to add the episode number on the top right corner of screen"""
         text = f'Episode #{self.avatar.knowledge.episode}'
         text_surface = self.myfont.render(text,False,(0,0,0),(255,255,255))
         self.disp_win.blit(text_surface,(4*self.width/5 - 45,15))

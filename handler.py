@@ -125,4 +125,8 @@ class ShowingHandler(Handler):
                 break
             elif event.type == py.KEYDOWN:
                 if event.key == py.K_RETURN:
-                    pass                        #ToDo: make this switch to the next iteration of saved knowledge
+                    self.window.avatar.quit_iter()
+                elif event.key == py.K_f:
+                    self.window.wait_time /= 1.2
+                elif event.key == py.K_s:
+                    self.window.wait_time *= 1.2

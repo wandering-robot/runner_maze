@@ -114,18 +114,36 @@ class Runner(AI):
         self.knowledge = self.knowledge_list[self.i]
         self.qs = self.knowledge.qs
 
+    def is_terminal(self):
+        """return true if the ai made it to the terminal state"""
+        return self.states[self.pos].purpose == 'finish'
+
+    def quit_iter(self):
+        """quit this current iteration and move on to the next one"""
+        self.pos = self.starting_state.coord
+        self.next_knowledge()
+    
     def next_knowledge(self):
-        """solve maze based on next knowledge iteration"""
-        self.iter += 1
-        self.qs = self.knowledge_list[iter].qs
+        """move to next knowledge iteration, terminate if no more"""
+        self.i += 1
+        try:
+            self.knowledge = self.knowledge_list[self.i]
+            self.qs = self.knowledge.qs
+        except:
+            py.quit()
+            self.window.running = False
+
 
     def move(self):
         """process of moving avatar to next state based on it's current maze knowledge"""
         state = self.window.cell_dict[self.pos]
-        action = super().get_action(state)
-        state_prime, reward = super().next_state_reward(state,action)
-        self.show_damage(state,state_prime)
-        self.pos = state_prime.coord
+        if not self.is_terminal():
+            action = super().get_action(state)
+            state_prime, reward = super().next_state_reward(state,action)
+            self.show_damage(state,state_prime)
+            self.pos = state_prime.coord
+        else:
+            self.quit_iter()
 
     def show_damage(self,state,state_prime):
         if state == state_prime:

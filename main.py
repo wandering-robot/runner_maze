@@ -15,7 +15,7 @@ class Main:
         self.autosave = autosave        #so that can automatically save if i want   
 
         if new:
-            self.cell_col_num = 3
+            self.cell_col_num = 10
                               #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
                                
@@ -112,6 +112,11 @@ class Main:
 
 
 if __name__ == "__main__":
+    print('''\t\t**Instructions**\n
+    While drawing:\n\ts: create start\n\tf: create finish\n\tleft click: create wall\n\tright click: delete\n\n
+    While Learning:\n\ts:save this episode (autosaves every 100 episodes)\n\tEnter: Move on to show results\n\n
+    While Showing:\n\tf: make simulation faster\n\ts:make simulation slower\n\tenter: skip to next episode
+    ''')
     user = input('[N]ew file or [L]oad?\t').lower()
     status = not user == 'l'
     main = Main(new=status,autosave=100)

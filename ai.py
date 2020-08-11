@@ -39,15 +39,40 @@ class AI:
         q = self.get_q(state,action)
 
         state_prime, reward = self.next_state_reward(state,action)
-        q_prime = self.get_q(state,action)
+        action_prime = self.get_action(state_prime)
+        q_prime = self.get_q(state_prime,action_prime)
 
-        q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
+        self.update_q_value(q,q_prime,reward)
+        if state != state_prime:
+            similar_qs = self.get_similar_qs(state_prime.coord,q)   #should normally do this
+        else:
+            similar_qs = self.get_similar_qs((state.coord[0]+action[0],state.coord[1]+action[1]),q) #if hits something, state stays same. need to project out-of-map/into-wall 
+        for pre_q in similar_qs:
+            self.update_q_value(pre_q,q_prime,reward)
 
         return state_prime
 
     def create_actions(self):
         """creates list of all actions that AI can take"""
         return [(del_row,del_col) for del_row in range(-1,2) for del_col in range(-1,2) if (del_row,del_col) != (0,0)]
+
+    def get_similar_qs(self,state_coord,q):
+        """returns a list other qs that would lead to that state, so
+         that the reward can be destributed to all of them"""
+        similar_qs = []
+        for action in self.actions:
+            try:
+                pre_state = self.states[(state_coord[0] - action[0], state_coord[1] - action[1])]       #by subtracting action it goes backwards
+                pre_q = self.get_q(pre_state,action)
+                if pre_q != q:
+                    similar_qs.append(pre_q)
+            except:
+                continue
+        return similar_qs
+
+    def update_q_value(self,q,q_prime,reward):
+        """Update rule derived from the Bellman Equation"""
+        q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
 
     def create_qs(self):
         """fill the qs dict with the state;s coord and the action as a Q's key"""

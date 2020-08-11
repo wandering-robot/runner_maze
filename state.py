@@ -34,7 +34,7 @@ class State:
             self.reward = -5
             self.colour = (0,0,0)
         elif role == 'finish':
-            self.reward = 5
+            self.reward = 100
             self.colour = (0,0,255)
         elif role == 'start':
             self.reward = -1

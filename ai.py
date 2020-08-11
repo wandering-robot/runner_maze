@@ -29,11 +29,11 @@ class AI:
             if state.purpose == 'finish':    #end episode if on the terminal state
                 break
             steps += 1
-            state = self.algorithm(state)
+            state = self.basic_ml(state)
         self.episode_num += 1
         return steps
 
-    def algorithm(self,state):
+    def basic_ml(self,state):
         """preforms the ML algorithm, returning the next state"""
         action = self.get_action(state)
         q = self.get_q(state,action)
@@ -157,6 +157,8 @@ class Runner(AI):
         except:
             py.quit()
             self.window.running = False
+            self.window.grapher.data_terminate()
+
 
 
     def move(self):

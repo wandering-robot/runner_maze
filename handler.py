@@ -9,6 +9,7 @@ class Handler:
         self.cell_size = window.cell_size
 
         #shutting down the program
+    
     def stop_running(self):
         self.window.running = False
         py.quit()
@@ -121,6 +122,7 @@ class ShowingHandler(Handler):
         for event in py.event.get():    
             if event.type == py.QUIT:
                 self.window.running = False
+                self.window.grapher.data_terminate()
                 py.quit()
                 break
             elif event.type == py.KEYDOWN:

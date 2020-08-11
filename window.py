@@ -72,6 +72,7 @@ class CreateWindow(Window):
         while self.running:
             steps = self.ai.run_episode()
             ep_num = self.ai.episode_num
+            self.main.grapher.add_data_point((ep_num,steps))     #save data to graph later
             if ep_num % 20 == 0:
                 self.progress_screen(ep_num,steps)
             status = self.handler.handle()
@@ -98,9 +99,7 @@ class CreateWindow(Window):
         """creates a knowledge class to be pickeled"""
         ep_num = self.ai.episode_num
         qs = self.ai.qs
-        for q in qs.values():
-            state = q.state
-            state.desurface()
+
         knowledge = Knowledge(qs,ep_num)
 
         #save knowledge to file name_knowledge_number
@@ -112,7 +111,14 @@ class CreateWindow(Window):
         outfile.close()
 
     def save_maze(self):
-        #save maze layout
+        """save maze layout"""
+        #make file if haven't yet
+        if not Path(self.main.maze_name).exists():
+            Path(self.main.maze_name).mkdir()
+        #desurface all cells for storage
+        for state in self.cell_dict.values():
+            state.desurface()
+        #save maze object
         if not Path(self.main.maze_name,f'{self.main.maze_name}_maze').exists():
             maze_file = Path(self.main.maze_name,f'{self.main.maze_name}_maze')
             outfile = open(maze_file,'wb')
@@ -122,6 +128,10 @@ class CreateWindow(Window):
 class ShowWindow(Window):
     def __init__(self,main,height,width,cell_size,retain_window=None,maze_name=None):
         super().__init__(main,height,width,cell_size,retain_window)
+
+        #run the graph alongside the episode display
+        self.main.grapher.save_data()
+        self.main.grapher.display_data()
 
         py.font.init()
         self.myfont = py.font.SysFont('Comic Sans MS',20)
@@ -174,16 +184,19 @@ class ShowWindow(Window):
     def load_knowledge(self):
         """returns a list of knowledge"""
         iter_files = [f for f in os.listdir(Path(self.maze_name))]
-        for i, f in enumerate(iter_files):
-            if not f[-1].isnumeric():         #gets rid of the maze layout file
-                del iter_files[i]
+        to_delete = []
+        for f in iter_files:
+            if not f[-1].isnumeric():         #gets rid of non-knowledge files
+                to_delete.append(f)
+        for f in to_delete:
+            iter_files.remove(f)
         iter_knowledge = []
         for f in iter_files:
             infile = open(Path(self.maze_name) / f,'rb')
             iter_knowledge.append(pickle.load(infile))
             infile.close()
         iter_knowledge.sort(key= lambda i: i.episode)
-
+ 
         return iter_knowledge
 
     def get_maze_name(self):

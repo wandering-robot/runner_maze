@@ -2,6 +2,8 @@
 
 from window import CreateWindow, ShowWindow
 from maze import Maze
+from grapher import Grapher
+
 
 import pickle       #for loading old mazes
 from pathlib import Path
@@ -27,10 +29,13 @@ class Main:
             self.maze = Maze(self.cell_col_num,self.cell_row_num,self.cell_size)
             self.maze.make_state_dict()
 
+            self.grapher = Grapher(self.maze_name)
+
             #creating section
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
             self.create_maze()
             self.window.start_drawing() #start drawing here, window called to start learning in handler
+            self.window.save_maze()
             self.window.start_learning(autosave=autosave)
 
             #showing section
@@ -38,6 +43,9 @@ class Main:
             self.window.show()
         else:
             self.maze = self.load_maze()
+            self.grapher = Grapher(self.maze_name)
+            self.grapher.load_data()
+
             #make main object have similar attributes in both new and old cases for consistency
             self.cell_size = self.maze.cell_size
             self.cell_col_num = self.maze.col_num
@@ -67,7 +75,7 @@ class Main:
         return maze_name
 
     def load_maze(self):
-        """loads the maze object from name_maze file"""
+        """loads the maze object from name_maze file, saves name as self.maze_name"""
         while True:
             self.maze_name = input('Please name the maze:\t')  
             try:

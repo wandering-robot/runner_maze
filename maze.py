@@ -13,7 +13,7 @@ class Maze:
         self.state_dict = None
 
     def make_state_dict(self):
-        """state dictionary will allow all states to be accessed by their coord tup"""
+        """create empty state dictionary to allow all states to be accessed by their coord tup"""
         self.state_dict = {}
         for row in range(self.row_num):
             for col in range(self.col_num):

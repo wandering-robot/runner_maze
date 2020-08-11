@@ -50,6 +50,15 @@ class Window:
         """takes in the states coord and returns the cell's top left coord for blotting"""
         return coord[1] * self.cell_size, coord[0] * self.cell_size
 
+    #starting state set in this method
+    def resurface_states(self,state_dict):
+        """resurfaces all the states in a dictionary, also ascribes starting state to self"""
+        for state in state_dict:
+            state.add_visuals()
+            if state.purpose == 'start':
+                self.starting_state = state
+                self.starting_state_coord = state.coord
+
 class CreateWindow(Window):
     def __init__(self,main,height,width,cell_size):
         super().__init__(main,height,width,cell_size)
@@ -209,10 +218,4 @@ class ShowWindow(Window):
                 print('Maze not found, please re-input')
         return maze_name
 
-    #starting state set in this method
-    def resurface_states(self,state_dict):
-        """resurfaces all the states in a dictionary, also ascribes starting state to self"""
-        for state in state_dict:
-            state.add_visuals()
-            if state.purpose == 'start':
-                self.starting_state = state
+

@@ -11,12 +11,14 @@ from shutil import rmtree   #to delete a preexisitng file if user wants to name 
 import sys      #to exit if user 
 
 class Main:
-    def __init__(self,new=True,autosave=None):
+    def __init__(self,mode='new',autosave=None):
         self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
         self.width = 500
+        
         self.autosave = autosave        #so that can automatically save if i want   
+        self.mode = mode
 
-        if new:
+        if self.mode == 'new':
             self.cell_col_num = 10
                               #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
@@ -41,7 +43,8 @@ class Main:
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
             self.window.show()
-        else:
+
+        elif self.mode == 'display':
             self.maze = self.load_maze()
             self.grapher = Grapher(self.maze_name)
             self.grapher.load_data()
@@ -55,6 +58,33 @@ class Main:
 
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,maze_name=self.maze_name)
             self.window.show()
+        
+        elif self.mode == 're-learn':
+            self.maze = self.load_maze()
+            self.grapher = Grapher(self.maze_name)
+
+            #make main object have similar attributes in both new and old cases for consistency
+            self.cell_size = self.maze.cell_size
+            self.cell_col_num = self.maze.col_num
+            self.cell_row_num = self.maze.row_num
+
+            self.optomize_sizes()
+
+            #learning section
+            self.window = CreateWindow(self,self.height,self.width,self.cell_size)
+            self.window.cell_dict = self.maze.state_dict
+            self.window.starting_state_coord = self.get_starting_state()
+            self.window.start_learning(autosave=autosave)
+
+            #showing section
+            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
+            self.window.show()
+
+    def get_starting_state(self):
+        """iterates throug all states to determine which one is the starting state"""
+        for state in self.maze.state_dict.values():
+            if state.purpose == 'start':
+                return state.coord
 
     def get_maze_name(self):
         """gets name from user, if already been used, has user delete old file"""
@@ -120,12 +150,39 @@ class Main:
 
 
 if __name__ == "__main__":
-    print('''\t\t**Instructions**\n
+    inst = '''\t\t**Instructions**\n
     While drawing:\n\ts: create start\n\tf: create finish\n\tleft click: create wall\n\tright click: delete\n\n
     While Learning:\n\ts:save this episode (autosaves every 100 episodes)\n\tEnter: Move on to show results\n\n
     While Showing:\n\tf: make simulation faster\n\ts:make simulation slower\n\tenter: skip to next episode
-    ''')
-    user = input('[N]ew file or [L]oad?\t').lower()
-    status = not user == 'l'
-    main = Main(new=status,autosave=100)
+    '''
+    print(inst)
+    while True:
+        print('At anytime type [Q]uit')
+        new_load = input('[N]ew file or [L]oad?\t').lower()
+        if new_load == 'n':
+            mode = 'new'
+            break
+        elif new_load == 'l':
+            while True:
+                learn = input('[R]e-train AI or [D]isplay old knowledge?:\t').lower()
+                if learn == 'r':
+                    mode = 're-learn'
+                    break
+                elif learn == 'd':
+                    mode = 'display'
+                    break
+                elif learn == 'q':
+                    mode = 'quit'
+                    break
+                else:
+                    print('Input not recognized, please re-enter\n')
+            break
+        elif new_load == 'q':
+            mode = 'quit'
+            break
+        else:
+            print('Input not recognized, please re-enter\n')
+
+
+    main = Main(mode=mode,autosave=100)
 

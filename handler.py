@@ -64,7 +64,12 @@ class CreateHandler(Handler):
         """main method to change a cell's purpose"""
         coord = self.cell2state(pos)
         try:
-            self.window.cell_dict[coord].assign_purpose(purpose)                
+            cell = self.window.cell_dict[coord]
+            if cell.purpose == 'start':
+                self.made_start = False
+            elif cell.purpose == 'finish':
+                self.made_finish = False
+            cell.assign_purpose(purpose)                
         except:
             pass
 
@@ -80,16 +85,18 @@ class CreateHandler(Handler):
 
     def make_start(self):
         """create the starting point for the maze runner from the mouse position"""
-        pos = py.mouse.get_pos()
-        self.change_cell(pos,'start')
-        self.made_start = True
-        self.window.starting_state_coord = self.cell2state(pos)
+        if not self.made_start:
+            pos = py.mouse.get_pos()
+            self.change_cell(pos,'start')
+            self.made_start = True
+            self.window.starting_state_coord = self.cell2state(pos)
 
     def make_finish(self):
         """create the finish line for the maze runner from the mouse position"""
-        pos = py.mouse.get_pos()
-        self.change_cell(pos,'finish')
-        self.made_finish = True
+        if not self.made_finish:
+            pos = py.mouse.get_pos()
+            self.change_cell(pos,'finish')
+            self.made_finish = True
 
 class RunningHandler(Handler):
     """handler for the learning portion of the program."""

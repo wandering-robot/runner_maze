@@ -70,8 +70,13 @@ class CreateWindow(Window):
         """method to run the drawing aspect of the program."""
         self.drawing = True
         while self.drawing:
-            self.update_screen()
-            self.handler.handle() 
+            try:
+                self.update_screen()
+                self.handler.handle() 
+                self.handler.handle() 
+                self.handler.handle() 
+            except:
+                pass
 
     def start_learning(self,autosave=None):
         """method that commences with the AI's learning, showing current results on screen"""
@@ -166,10 +171,10 @@ class ShowWindow(Window):
     def show(self):
         self.wait_time = 0.25
         while self.running:
-            self.update_screen()
-            self.blit_episode_num()
-            self.avatar.move()
             try:
+                self.update_screen()
+                self.blit_episode_num()
+                self.avatar.move()
                 self.handler.handle()       #so that doesn't error out if completed
             except:
                 pass

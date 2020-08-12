@@ -135,7 +135,7 @@ class ShowingHandler(Handler):
             elif event.type == py.KEYDOWN:
                 if event.key == py.K_RETURN:
                     self.window.avatar.quit_iter()
-                elif event.key == py.K_f:
+                elif event.key == py.K_UP:
                     self.window.wait_time /= 1.2
-                elif event.key == py.K_s:
+                elif event.key == py.K_DOWN:
                     self.window.wait_time *= 1.2

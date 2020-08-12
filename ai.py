@@ -138,6 +138,8 @@ class Runner(AI):
         self.i = 0
         self.knowledge = self.knowledge_list[self.i]
         self.qs = self.knowledge.qs
+        self.re_green(self.qs,self.window.cell_dict)
+
 
     def is_terminal(self):
         """return true if the ai made it to the terminal state"""
@@ -154,12 +156,43 @@ class Runner(AI):
         try:
             self.knowledge = self.knowledge_list[self.i]
             self.qs = self.knowledge.qs
+            self.re_green(self.qs,self.window.cell_dict)
         except:
             py.quit()
             self.window.running = False
             self.window.grapher.data_terminate()
 
+    def re_green(self,qs,cell_dict):
+        """iterate through all states ascribing them values as determined by the Ai's 
+        current state-action pair knowledge. Then change their green-ness based on value"""
+        state_values = []
+        for state in cell_dict.values():
+            #skip all walls etc
+            if state.purpose != None:
+                continue
+            actions = self.actions[:]
+            action_values = [self.qs[(state.coord,action)].value for action in actions]
+            action_num = len(action_values)
 
+            max_value = max(action_values)
+            action_values.remove(max_value)
+
+            #create state.value and incrementally increase it's expected value
+            state.value = 0
+            for value in action_values:
+                state.value += value*(self.epsilon/action_num)
+            state.value += max_value*(1 - self.epsilon)
+
+            state_values.append(state.value)
+
+        max_value = max(state_values)
+        min_value = min(state_values)
+
+        #go through and actually 
+        for state in cell_dict.values():
+            if state.purpose != None:
+                continue
+            state.re_green(max_value,min_value)
 
     def move(self):
         """process of moving avatar to next state based on it's current maze knowledge"""

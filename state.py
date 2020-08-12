@@ -1,6 +1,7 @@
 """States and cells are interchangeable, makes sense to think of them as a bunch of 1x1 squares of a
 checkerboard. They will be rescaled as necessary by the window"""
 import pygame as py
+from math import log,exp
 
 class State:
     def __init__(self,row,col):
@@ -10,9 +11,10 @@ class State:
 
         self.purpose = None
         self.reward = None
+        self.value = None
 
     def __repr__(self):
-        return f'SC@{self.coord}'
+        return f'SC@{self.coord},V={self.value}'
 
     def add_visuals(self,size=None):
         """Method run to add the cell aspects to each state. Mostly to tell them what size they are"""
@@ -47,6 +49,15 @@ class State:
         except:
             pass
 
+
+    def re_green(self,max,min):
+        #rescale so no negatives
+        max = max - min + 1
+        self.value = self.value - min + 1
+        min = 1
+
+        rb = 100*(log(max) - log(self.value))/(log(max) - log(min))
+        self.cell.fill((rb,100,rb))
 
 class Q:
     def __init__(self,state,action):

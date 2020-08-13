@@ -136,15 +136,23 @@ class NewPage(Page):
     def display_availability(self,name=None):
         """called when name button pressed to inform user if name has been used already"""
         if name == None:
-            name = self.new_name_entry.get()        #so that can be called at beginning to space things out
+            name = self.new_name_entry.get().lower()        #so that can be called at beginning to space things out
+        allowed = True
         if not name == '':
-            self.checked_name = True
-            if Path('storage',name).exists():
-                avail_label = Label(self, text=f'     Name {name} is taken.     ', justify=CENTER)
-                avail_label2 = Label(self, text=f'This will overwrite old file.', justify=CENTER)
-            else:
-                avail_label = Label(self, text=f'Name {name} is available', justify=CENTER)
-                avail_label2 = Label(self, text=f'                                              ')
+            illegals = ['#','%','&','{','}','\\','<','>','*','?','/',' ','$','!','\'','"',':','@','+','`','|','=']
+            for illegal in illegals:
+                if illegal in name:
+                    avail_label = Label(self, text=f'{illegal} is illegal character', justify=CENTER)
+                    avail_label2 = Label(self, text=f'                                              ') 
+                    allowed = False
+            if allowed:
+                self.checked_name = True
+                if Path('storage',name).exists():
+                    avail_label = Label(self, text=f'     Name {name} is taken.     ', justify=CENTER)
+                    avail_label2 = Label(self, text=f'This will overwrite old file.', justify=CENTER)
+                else:
+                    avail_label = Label(self, text=f'Name {name} is available', justify=CENTER)
+                    avail_label2 = Label(self, text=f'                                              ')
         else:
             avail_label = Label(self, text=f'')
             avail_label2 = Label(self, text=f'')
@@ -161,7 +169,7 @@ class NewPage(Page):
         save_freq = self.spinner.get()
 
         if name != '' and self.checked_name:
-            self.gui.main.maze_name = name
+            self.gui.main.maze_name = name.lower()
             self.gui.main.cell_col_num = col_num
             self.gui.main.autosave = int(save_freq)
             self.gui.main.mode = 'n'
@@ -336,6 +344,3 @@ class GUI:
         """moves all the pages out of view"""
         for page in self.pages:
             page.hide()
-
-if __name__ == '__main__':
-    gui = GUI()

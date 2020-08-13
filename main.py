@@ -157,11 +157,5 @@ class Main:
             Path('storage').mkdir()
 
 if __name__ == "__main__":
-    inst = '''\t\t**Instructions**\n
-    While drawing:\n\ts: create start\n\tf: create finish\n\tleft click: create wall\n\tright click: delete\n\n
-    While Learning:\n\ts:save this episode (autosaves every 100 episodes)\n\tEnter: Move on to show results\n\n
-    While Showing:\n\tup arrow: make simulation faster\n\tdown arrow:make simulation slower\n\tenter: skip to next episode
-    '''
-    print(inst)
     Main()
     

@@ -117,9 +117,9 @@ class CreateWindow(Window):
         knowledge = Knowledge(qs,ep_num)
 
         #save knowledge to file name_knowledge_number
-        if not Path(self.main.maze_name).exists():
-            Path(self.main.maze_name).mkdir()
-        filename = Path(self.main.maze_name)/ f'{self.main.maze_name}_knowledge_{ep_num}'
+        if not Path('storage',self.main.maze_name).exists():
+            Path('storage',self.main.maze_name).mkdir()
+        filename = Path('storage',self.main.maze_name)/ f'{self.main.maze_name}_knowledge_{ep_num}'
         outfile = open(filename,'wb')
         pickle.dump(knowledge,outfile)
         outfile.close()
@@ -127,14 +127,14 @@ class CreateWindow(Window):
     def save_maze(self):
         """save maze layout"""
         #make file if haven't yet
-        if not Path(self.main.maze_name).exists():
-            Path(self.main.maze_name).mkdir()
-        #desurface all cells for storage
+        if not Path('storage',self.main.maze_name).exists():
+            Path('storage',self.main.maze_name).mkdir()
+        #desurface all cells for 'storage'
         for state in self.cell_dict.values():
             state.desurface()
         #save maze object
-        if not Path(self.main.maze_name,f'{self.main.maze_name}_maze').exists():
-            maze_file = Path(self.main.maze_name,f'{self.main.maze_name}_maze')
+        if not Path('storage',self.main.maze_name,f'{self.main.maze_name}_maze').exists():
+            maze_file = Path('storage',self.main.maze_name,f'{self.main.maze_name}_maze')
             outfile = open(maze_file,'wb')
             pickle.dump(self.main.maze,outfile)
             outfile.close()
@@ -189,7 +189,7 @@ class ShowWindow(Window):
 
     def load_maze(self):
         """loads the maze object from name_maze file"""
-        filename = Path(self.maze_name,f'{self.maze_name}_maze')
+        filename = Path('storage',self.maze_name,f'{self.maze_name}_maze')
         infile = open(filename,'rb')
         maze = pickle.load(infile)
         infile.close()
@@ -197,7 +197,7 @@ class ShowWindow(Window):
 
     def load_knowledge(self):
         """returns a list of knowledge"""
-        iter_files = [f for f in os.listdir(Path(self.maze_name))]
+        iter_files = [f for f in os.listdir(Path('storage',self.maze_name))]
         to_delete = []
         for f in iter_files:
             if not f[-1].isnumeric():         #gets rid of non-knowledge files
@@ -206,7 +206,7 @@ class ShowWindow(Window):
             iter_files.remove(f)
         iter_knowledge = []
         for f in iter_files:
-            infile = open(Path(self.maze_name) / f,'rb')
+            infile = open(Path('storage',self.maze_name) / f,'rb')
             iter_knowledge.append(pickle.load(infile))
             infile.close()
         iter_knowledge.sort(key= lambda i: i.episode)
@@ -217,7 +217,7 @@ class ShowWindow(Window):
         """gets maze name from user and ensures that it exists"""
         while True:
             maze_name = input('Input maze_name to load:\t')
-            if Path(maze_name).exists(): 
+            if Path('storage',maze_name).exists(): 
                 break
             else:
                 print('Maze not found, please re-input')

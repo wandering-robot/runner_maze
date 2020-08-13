@@ -90,7 +90,7 @@ class Main:
         """gets name from user, if already been used, has user delete old file"""
         while True:
             maze_name = input('Please name the maze:\t')
-            if Path(maze_name).exists():
+            if Path('storage',maze_name).exists():
                 valid = False
                 while not valid:
                     delete = input("Maze already exists. Overwrite? y/n:\t").lower()
@@ -98,7 +98,7 @@ class Main:
                     if not valid:
                         print('Error, expecting y or n\n')
                 if delete == 'y':
-                    rmtree(Path(maze_name), ignore_errors=True)
+                    rmtree(Path('storage',maze_name), ignore_errors=True)
                     break
             else:
                 break
@@ -109,7 +109,7 @@ class Main:
         while True:
             self.maze_name = input('Please name the maze:\t')  
             try:
-                filename = Path(self.maze_name,f'{self.maze_name}_maze')
+                filename = Path('storage',self.maze_name,f'{self.maze_name}_maze')
                 infile = open(filename,'rb')
                 maze = pickle.load(infile)
                 infile.close()

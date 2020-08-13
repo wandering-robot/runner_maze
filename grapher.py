@@ -16,23 +16,23 @@ class Grapher:
         self.range.append(data_tup[1])
 
     def save_data(self):
-        path = Path(self.maze_name) / f'{self.maze_name}_graph'
+        path = Path('storage',self.maze_name) / f'{self.maze_name}_graph'
 
         plt.plot(self.domain,self.range)
         plt.ylabel('Steps taken')
         plt.xlabel('Episode Number')
         plt.savefig(path)
 
-        if not Path(self.maze_name).exists():
-            Path(self.maze_name).mkdir()
-        filename = Path(self.maze_name)/ f'{self.maze_name}_raw_data'
+        if not Path('storage',self.maze_name).exists():
+            Path('storage',self.maze_name).mkdir()
+        filename = Path('storage',self.maze_name)/ f'{self.maze_name}_raw_data'
         outfile = open(filename,'wb')
         data = (self.domain,self.range)
         pickle.dump(data,outfile)
         outfile.close()
 
     def load_data(self):
-        filename = Path(self.maze_name)/ f'{self.maze_name}_raw_data'
+        filename = Path('storage',self.maze_name)/ f'{self.maze_name}_raw_data'
         infile = open(filename,'rb')
         data = pickle.load(infile)
         self.domain, self.range = data

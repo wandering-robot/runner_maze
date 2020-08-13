@@ -68,15 +68,13 @@ class CreateWindow(Window):
 
     def start_drawing(self):
         """method to run the drawing aspect of the program."""
-        self.drawing = True
-        while self.drawing:
+        self.running = True
+        while self.running:
             try:
                 self.update_screen()
                 self.handler.handle() 
-                self.handler.handle() 
-                self.handler.handle() 
-            except:
-                pass
+            except Exception as error:
+                print(error)
 
     def start_learning(self,autosave=None):
         """method that commences with the AI's learning, showing current results on screen"""

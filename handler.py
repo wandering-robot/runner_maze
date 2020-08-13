@@ -2,6 +2,7 @@
 depend on if the program is creating or showing"""
 
 import pygame as py
+import sys
 
 class Handler:
     def __init__(self,window):
@@ -12,7 +13,7 @@ class Handler:
     
     def stop_running(self):
         self.window.running = False
-        self.window.main.grapher.data_terminate
+        del self.window.main.grapher
         py.quit()
     
     def cell2state(self,pos):

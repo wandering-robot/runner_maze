@@ -39,12 +39,14 @@ class Main:
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
             self.create_maze()
             self.window.start_drawing() #start drawing here, window called to start learning in handler
-            self.window.save_maze()
-            self.window.start_learning(autosave=self.autosave)
+            
+            if self.window.running:     #allow user to quit here if they want
+                self.window.save_maze()
+                self.window.start_learning(autosave=self.autosave)
 
-            #showing section
-            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
-            self.window.show()
+                #showing section
+                self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
+                self.window.show()
 
         elif self.mode == 'd':
             self.maze = self.load_maze()

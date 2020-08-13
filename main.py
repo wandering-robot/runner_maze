@@ -79,8 +79,11 @@ class Main:
             self.window.start_learning(autosave=self.autosave)
 
             #showing section
-            self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
-            self.window.show()
+            try:            #allow user to quit while learning
+                self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
+                self.window.show()
+            except:
+                pass
 
     def get_starting_state(self):
         """iterates throug all states to determine which one is the starting state"""
@@ -141,8 +144,7 @@ class Main:
         self.cell_row_num = self.height // self.cell_size   
         
         #optomize the height aspects
-        if self.height % self.cell_row_num != 0:
-            self.height = self.cell_row_num * self.cell_size
+        self.height = self.cell_row_num * self.cell_size
 
 
     def calc_cell_size(self):

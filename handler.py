@@ -12,6 +12,7 @@ class Handler:
     
     def stop_running(self):
         self.window.running = False
+        self.window.main.grapher.data_terminate
         py.quit()
     
     def cell2state(self,pos):

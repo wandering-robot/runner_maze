@@ -82,7 +82,7 @@ class CreateWindow(Window):
         """method that commences with the AI's learning, showing current results on screen"""
         self.ai = AI(self)
         self.handler = RunningHandler(self)
-
+        self.delete_old_knowledge()             #clear out old pickeld knowledge 
         while self.running:
             steps = self.ai.run_episode()
             ep_num = self.ai.episode_num
@@ -97,6 +97,16 @@ class CreateWindow(Window):
                 for q in self.ai.qs.values():
                     q.state.add_visuals()
                 break
+
+    def delete_old_knowledge(self):
+        """called by start_learning to empty knowledge memory if any exists"""
+        iter_files = [f for f in os.listdir(Path('storage',self.main.maze_name))]
+        to_delete = []
+        for f in iter_files:
+            if f[-1].isnumeric():         #gets rid of knowledge files
+                to_delete.append(f)
+        for f in to_delete:
+            os.remove(Path('storage',self.main.maze_name,f))
 
     def progress_screen(self,ep_num,steps):
         """displays the AI's learning progress"""

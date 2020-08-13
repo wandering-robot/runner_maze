@@ -77,23 +77,28 @@ class NewPage(Page):
         self.new_name_entry.grid(row=1, column=1)
         #button to return to main screen
         main_button = Button(self,text='Back',command= lambda: self.gui.show_page('m'))
-        main_button.grid(row=8, column=0)
+        main_button.grid(row=9, column=0)
+        #get autosave frequency
+        autosave1_label = Label(self,text='Record progress every').grid(row=5,column=0,pady=20)
+        autosave2_lable = Label(self,text='episodes').grid(row=5, column=2)
+        self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150)
+        self.spinner.grid(row=5,column=1,pady=20)
         #label next to resolution slider
         new_label3 = Label(self, text='Maze Resolution')
-        new_label3.grid(row=5,column=0)
+        new_label3.grid(row=6,column=0)
         #label under resolution slider
         new_label4 = Label(self, text='*High Resolution = Long Solving Time*', justify=CENTER)
-        new_label4.grid(row=6,column=1)
+        new_label4.grid(row=7,column=1)
         #extra space label
         new_label5 = Label(self, text=' ', justify=CENTER)
-        new_label5.grid(row=7,column=1)
+        new_label5.grid(row=8,column=1)
 
         #resolution slider
         self.slider = Scale(self, orient=HORIZONTAL, from_=3, to=12, length=125)            #set col num from 3 to 12
-        self.slider.grid(row=5, column=1)
+        self.slider.grid(row=6, column=1)
         #start button
         start_button = Button(self,text='Start!',command=self.start_new_simulation)
-        start_button.grid(row=8,column=2)
+        start_button.grid(row=9,column=2)
 
     def display_availability(self,name=None):
         """called when name button pressed to inform user if name has been used already"""
@@ -118,11 +123,16 @@ class NewPage(Page):
 
     def start_new_simulation(self):
         "start a new simlation"
-        self.name = self.new_name_entry.get()
-        self.col_num = self.slider.get()
+        name = self.new_name_entry.get()
+        col_num = self.slider.get()
+        save_freq = self.spinner.get()
 
-        if self.name != '' and self.checked_name:
-            print(f'start {self.name} with col num {self.col_num}')
+        if name != '' and self.checked_name:
+            self.gui.main.maze_name = name
+            self.gui.main.cell_col_num = col_num
+            self.gui.main.autosave = int(save_freq)
+            self.gui.main.mode = 'n'
+            self.gui.root.destroy()
         else:
             label6 = Label(self, text='Enter and Check Name', justify=CENTER)
             label6.grid(row=9, column=1)
@@ -163,7 +173,8 @@ class RetrainPage(Page):
         i=1
         for root, dirs, files in os.walk('storage'):
             for name in dirs:
-                selector.insert(i,name)
+                if Path('storage',name,f'{name}_maze').exists():
+                    selector.insert(i,name)
 
     def warning(self,warn=False):
         """make the label that tells user they need to select a name"""
@@ -176,9 +187,14 @@ class RetrainPage(Page):
     def start_retrain_simulation(self):
         """tries to start the simulation"""
         try:
-            self.name = self.selector.get(self.selector.curselection())
-            self.save_freq = self.spinner.get()
-            print(self.name,self.save_freq)
+            name = self.selector.get(self.selector.curselection())
+            save_freq = self.spinner.get()
+            
+            self.gui.main.maze_name = name
+            self.gui.main.autosave = int(save_freq)
+            self.gui.main.mode = 'r'
+            self.gui.root.destroy()
+
         except:
             self.warning(warn=True)
 
@@ -199,7 +215,7 @@ class DisplayPage(Page):
         self.selector.grid(row=3, column=1)
         self.get_options(self.selector)
         #start button
-        start_button = Button(self,text='Start!',command=self.start_retrain_simulation,)
+        start_button = Button(self,text='Start!',command=self.start_display_simulation,)
         start_button.grid(row=5,column=2,pady=50)
         #warning label
         self.warning()
@@ -209,11 +225,17 @@ class DisplayPage(Page):
         main_button.grid(row=5, column=0)
 
     def get_options(self,selector):
-        """fill the selector with all the saved mazes available"""
+        """fill selector with maze that have both layouts and knowledge"""
         i=1
-        for root, dirs, files in os.walk('storage'):
+        for root, dirs, _ in os.walk('storage'):
             for name in dirs:
-                selector.insert(i,name)
+                for _, _, files in os.walk(Path(root,name)):
+                    if not Path('storage',name,f'{name}_maze').exists():
+                        continue
+                    for file_name in files:
+                        if file_name[-1].isnumeric():
+                            selector.insert(i,name)
+                            break
 
     def warning(self,warn=False):
         """make the label that tells user they need to select a name"""
@@ -223,24 +245,28 @@ class DisplayPage(Page):
             warn_label = Label(self,text='Must Select a Maze')
         warn_label.grid(row=4,column=1)
 
-    def start_retrain_simulation(self):
+    def start_display_simulation(self):
         """tries to start the simulation"""
         try:
-            self.name = self.selector.get(self.selector.curselection())
-            print(self.name)
+            name = self.selector.get(self.selector.curselection())
+            self.gui.main.maze_name = name
+            self.gui.main.mode = 'd'
+            self.gui.root.destroy()
         except:
             self.warning(warn=True)
 
 
 class GUI:
-    def __init__(self):
+    def __init__(self,main):
+        self.main = main
+        
         self.root = Tk()
         self.root.title('Ai_Simulator')
         #self.root.iconbitmap(path to icon)
-        self.root.geometry('400x350') 
+        self.root.geometry('450x400') 
         self.root.resizable(False,False)
 
-        self.main = MainPage(self, padx=35, pady=100)
+        self.main_page = MainPage(self, padx=35, pady=100)
         self.new = NewPage(self, padx=10, pady=75)
         self.retrain = RetrainPage(self, padx=5, pady=50)
         self.display = DisplayPage(self, padx=5, pady=75)
@@ -248,12 +274,12 @@ class GUI:
         self.new.place(x=0, y=0)
         self.retrain.place(x=0, y=0)
         self.display.place(x=0, y=0)
-        self.main.place(x=0, y=0)
+        self.main_page.place(x=0, y=0)
 
-        self.pages = [self.main, self.new, self.retrain, self.display]
+        self.pages = [self.main_page, self.new, self.retrain, self.display]
 
         self.hide_pages()
-        self.main.show()
+        self.main_page.show()
 
         self.root.mainloop()
 

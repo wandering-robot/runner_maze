@@ -3,6 +3,7 @@
 from window import CreateWindow, ShowWindow
 from maze import Maze
 from grapher import Grapher
+from gui import GUI
 
 
 import pickle       #for loading old mazes
@@ -11,15 +12,16 @@ from shutil import rmtree   #to delete a preexisitng file if user wants to name 
 import sys      #to exit if user 
 
 class Main:
-    def __init__(self,mode='new',autosave=None):
+    def __init__(self):
         self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
         self.width = 500
-        
-        self.autosave = autosave        #so that can automatically save if i want   
-        self.mode = mode
+        self.mode = None            #should pass all options and do nothing
+        self.gui = GUI(self)
+        # self.autosave = autosave        #so that can automatically save if i want   
+        # self.mode = mode
 
-        if self.mode == 'new':
-            self.cell_col_num = 10
+        if self.mode == 'n':
+            # self.cell_col_num = 10
                               #number of cells that will span the width of the window
             self.cell_row_num = None                #will be made in self.optomize_sizes
                                
@@ -27,7 +29,7 @@ class Main:
 
             self.optomize_sizes()
 
-            self.maze_name = self.get_maze_name()
+            # self.maze_name = self.get_maze_name()
             self.maze = Maze(self.cell_col_num,self.cell_row_num,self.cell_size)
             self.maze.make_state_dict()
 
@@ -38,13 +40,13 @@ class Main:
             self.create_maze()
             self.window.start_drawing() #start drawing here, window called to start learning in handler
             self.window.save_maze()
-            self.window.start_learning(autosave=autosave)
+            self.window.start_learning(autosave=self.autosave)
 
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
             self.window.show()
 
-        elif self.mode == 'display':
+        elif self.mode == 'd':
             self.maze = self.load_maze()
             self.grapher = Grapher(self.maze_name)
             self.grapher.load_data()
@@ -59,7 +61,7 @@ class Main:
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,maze_name=self.maze_name)
             self.window.show()
         
-        elif self.mode == 're-learn':
+        elif self.mode == 'r':
             self.maze = self.load_maze()
             self.grapher = Grapher(self.maze_name)
 
@@ -74,7 +76,7 @@ class Main:
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
             self.window.cell_dict = self.maze.state_dict
             self.window.starting_state_coord = self.get_starting_state()
-            self.window.start_learning(autosave=autosave)
+            self.window.start_learning(autosave=self.autosave)
 
             #showing section
             self.window = ShowWindow(self,self.height,self.width,self.cell_size,retain_window=self.window.disp_win,maze_name=self.maze_name)
@@ -107,7 +109,6 @@ class Main:
     def load_maze(self):
         """loads the maze object from name_maze file, saves name as self.maze_name"""
         while True:
-            self.maze_name = input('Please name the maze:\t')  
             try:
                 filename = Path('storage',self.maze_name,f'{self.maze_name}_maze')
                 infile = open(filename,'rb')
@@ -156,33 +157,34 @@ if __name__ == "__main__":
     While Showing:\n\tup arrow: make simulation faster\n\tdown arrow:make simulation slower\n\tenter: skip to next episode
     '''
     print(inst)
-    while True:
-        print('At anytime type [Q]uit')
-        new_load = input('[N]ew file or [L]oad?\t').lower()
-        if new_load == 'n':
-            mode = 'new'
-            break
-        elif new_load == 'l':
-            while True:
-                learn = input('[R]e-train AI or [D]isplay old knowledge?:\t').lower()
-                if learn == 'r':
-                    mode = 're-learn'
-                    break
-                elif learn == 'd':
-                    mode = 'display'
-                    break
-                elif learn == 'q':
-                    mode = 'quit'
-                    break
-                else:
-                    print('Input not recognized, please re-enter\n')
-            break
-        elif new_load == 'q':
-            mode = 'quit'
-            break
-        else:
-            print('Input not recognized, please re-enter\n')
+    Main()
+    # while True:
+    #     print('At anytime type [Q]uit')
+    #     new_load = input('[N]ew file or [L]oad?\t').lower()
+    #     if new_load == 'n':
+    #         mode = 'new'
+    #         break
+    #     elif new_load == 'l':
+    #         while True:
+    #             learn = input('[R]e-train AI or [D]isplay old knowledge?:\t').lower()
+    #             if learn == 'r':
+    #                 mode = 're-learn'
+    #                 break
+    #             elif learn == 'd':
+    #                 mode = 'display'
+    #                 break
+    #             elif learn == 'q':
+    #                 mode = 'quit'
+    #                 break
+    #             else:
+    #                 print('Input not recognized, please re-enter\n')
+    #         break
+    #     elif new_load == 'q':
+    #         mode = 'quit'
+    #         break
+    #     else:
+    #         print('Input not recognized, please re-enter\n')
 
 
-    main = Main(mode=mode,autosave=100)
+    # main = Main(mode=mode,autosave=100)
 

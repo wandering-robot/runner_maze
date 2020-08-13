@@ -28,6 +28,7 @@ class MainPage(Page):
         ("New", "n"),
         ("Re-train", "r"),
         ("Display", "d"),
+        ("Instructions","i")
         ]
 
         self.var = StringVar()
@@ -52,9 +53,41 @@ class MainPage(Page):
             func_text = 'Load an old maze from memory, and train a new AI to solve it.'
         elif mode == 'd':
             func_text = 'Load an old maze from memory, and display the old AI\'s solution to it.'
-        textbox = Text(self, height=6, width=25, wrap=WORD)
+        textbox = Text(self, height=6, width=25, wrap=WORD,borderwidth=3,relief="sunken")
         textbox.insert('1.0',func_text)
         textbox.grid(sticky=W, row=1, column=2,rowspan=3)
+
+class InstPage(Page):
+    def __init__(self,gui,*args,**kwargs):
+        Page.__init__(self,*args,**kwargs)
+
+        self.gui = gui
+
+        #lable next to name entry
+        new_label2 = Label(self,text='Instructions:')      #had label1 but deleted it
+        new_label2.grid(row=0,column=0)
+
+        #show instructions
+        str1 ='''While drawing:\n\ts: create start\n\tf: create finish\n\tleft click: create wall\n\tright click: delete'''
+        str2 ='''While Learning:\n\ts:save this particular episode\n\tEnter: Move on to show results\n\n'''
+        str3 ='''While Showing:\n\tup arrow: make simulation faster\n\tdown arrow:make simulation slower\n\tenter: skip to next episode'''
+
+        inst1 = Text(self,width=45,height=5,borderwidth=3,relief="sunken")
+        inst1.insert(END, str1)
+        inst1.grid(row=1,column=0)
+
+        inst2 = Text(self,width=45,height=5,borderwidth=3,relief="sunken")
+        inst2.insert(END, str2)
+        inst2.grid(row=2,column=0)
+
+        inst3 = Text(self,width=45,height=6,borderwidth=3,relief="sunken")
+        inst3.insert(END, str3)
+        inst3.grid(row=3,column=0)
+
+        #button to return to main screen
+        main_button = Button(self,text='Back',command= lambda: self.gui.show_page('m'))
+        main_button.grid(row=9, column=0)
+        
 
 class NewPage(Page):
     def __init__(self,gui,*args,**kwargs):
@@ -73,7 +106,7 @@ class NewPage(Page):
         name = StringVar()
         name.set('')
         self.display_availability(name.get())
-        self.new_name_entry = Entry(self, width=25, textvariable=name)
+        self.new_name_entry = Entry(self, width=25, textvariable=name,borderwidth=3,relief="sunken")
         self.new_name_entry.grid(row=1, column=1)
         #button to return to main screen
         main_button = Button(self,text='Back',command= lambda: self.gui.show_page('m'))
@@ -81,7 +114,7 @@ class NewPage(Page):
         #get autosave frequency
         autosave1_label = Label(self,text='Record progress every').grid(row=5,column=0,pady=20)
         autosave2_lable = Label(self,text='episodes').grid(row=5, column=2)
-        self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150)
+        self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150,borderwidth=3,relief="sunken")
         self.spinner.grid(row=5,column=1,pady=20)
         #label next to resolution slider
         new_label3 = Label(self, text='Maze Resolution')
@@ -150,7 +183,7 @@ class RetrainPage(Page):
         train_label2.grid(row = 3, column=0,padx=50)
         #maze_selector
         scroller = Scrollbar(self)
-        self.selector = Listbox(self, height=5, selectmode=SINGLE, yscrollcommand=scroller)
+        self.selector = Listbox(self, height=5, selectmode=SINGLE, yscrollcommand=scroller,borderwidth=3,relief="sunken")
         self.selector.grid(row=3, column=1)
         self.get_options(self.selector)
         #start button
@@ -161,7 +194,7 @@ class RetrainPage(Page):
         #autosave number getter
         autosave1_label = Label(self,text='Record progress every').grid(row=0,column=0)
         autosave2_lable = Label(self,text='episodes').grid(row=0, column=2)
-        self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150)
+        self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150,borderwidth=3,relief="sunken")
         self.spinner.grid(row=0,column=1,pady=20)
 
         #return to main button
@@ -211,7 +244,7 @@ class DisplayPage(Page):
         train_label2.grid(row = 3, column=0,padx=50)
         #maze_selector
         scroller = Scrollbar(self)
-        self.selector = Listbox(self, height=5, selectmode=SINGLE, yscrollcommand=scroller)
+        self.selector = Listbox(self, height=5, selectmode=SINGLE, yscrollcommand=scroller,borderwidth=3,relief="sunken")
         self.selector.grid(row=3, column=1)
         self.get_options(self.selector)
         #start button
@@ -267,16 +300,18 @@ class GUI:
         self.root.resizable(False,False)
 
         self.main_page = MainPage(self, padx=35, pady=100)
+        self.inst = InstPage(self, padx=30, pady=45)
         self.new = NewPage(self, padx=10, pady=75)
         self.retrain = RetrainPage(self, padx=5, pady=50)
         self.display = DisplayPage(self, padx=5, pady=75)
 
+        self.inst.place(x=0,y=0)
         self.new.place(x=0, y=0)
         self.retrain.place(x=0, y=0)
         self.display.place(x=0, y=0)
         self.main_page.place(x=0, y=0)
 
-        self.pages = [self.main_page, self.new, self.retrain, self.display]
+        self.pages = [self.main_page, self.new, self.retrain, self.display, self.inst]
 
         self.hide_pages()
         self.main_page.show()
@@ -289,11 +324,13 @@ class GUI:
         if var == 'n':
             self.new.show()
         elif var == 'm':
-            self.main.show()
+            self.main_page.show()
         elif var == 'r':
             self.retrain.show()
         elif var == 'd':
             self.display.show()
+        elif var == 'i':
+            self.inst.show()
 
     def hide_pages(self):
         """moves all the pages out of view"""

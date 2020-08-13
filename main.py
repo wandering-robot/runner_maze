@@ -17,13 +17,10 @@ class Main:
         self.width = 500
         self.mode = None            #should pass all options and do nothing
         self.gui = GUI(self)
-        # self.autosave = autosave        #so that can automatically save if i want   
-        # self.mode = mode
 
         if self.mode == 'n':
-            # self.cell_col_num = 10
-                              #number of cells that will span the width of the window
-            self.cell_row_num = None                #will be made in self.optomize_sizes
+
+            self.cell_row_num = None                #will be made in self.optomize_sizes, col_num passed from GUI
                                
             self.cell_size = self.calc_cell_size()
 
@@ -162,33 +159,4 @@ if __name__ == "__main__":
     '''
     print(inst)
     Main()
-    # while True:
-    #     print('At anytime type [Q]uit')
-    #     new_load = input('[N]ew file or [L]oad?\t').lower()
-    #     if new_load == 'n':
-    #         mode = 'new'
-    #         break
-    #     elif new_load == 'l':
-    #         while True:
-    #             learn = input('[R]e-train AI or [D]isplay old knowledge?:\t').lower()
-    #             if learn == 'r':
-    #                 mode = 're-learn'
-    #                 break
-    #             elif learn == 'd':
-    #                 mode = 'display'
-    #                 break
-    #             elif learn == 'q':
-    #                 mode = 'quit'
-    #                 break
-    #             else:
-    #                 print('Input not recognized, please re-enter\n')
-    #         break
-    #     elif new_load == 'q':
-    #         mode = 'quit'
-    #         break
-    #     else:
-    #         print('Input not recognized, please re-enter\n')
-
-
-    # main = Main(mode=mode,autosave=100)
-
+    

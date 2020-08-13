@@ -64,6 +64,7 @@ class CreateWindow(Window):
         super().__init__(main,height,width,cell_size)
         py.font.init()
         self.myfont = py.font.SysFont('Comic Sans MS',30)
+        self.small_font = py.font.SysFont('Comic Sans MS',15)
         self.handler = CreateHandler(self)
 
     def start_drawing(self):
@@ -111,10 +112,15 @@ class CreateWindow(Window):
         self.disp_win.blit(self.background,(0,0))
         title1 = f'Episode #{ep_num}'
         title2 = f'took {steps} steps'
+        title3 = '(press enter when you want to stop learning)'
         text1_surface = self.myfont.render(title1,False,(0,0,0))
         text2_surface = self.myfont.render(title2,False,(0,0,0))
+        text3_surface = self.small_font.render(title3,False,(0,0,0))
+
         self.disp_win.blit(text1_surface,(self.width/4,self.height/3))
         self.disp_win.blit(text2_surface,(self.width/4,self.height/3 + 30))
+        self.disp_win.blit(text3_surface,(self.width/6,2*self.height/3 + 30))
+
         py.display.flip()
 
     def save_knowledge(self):

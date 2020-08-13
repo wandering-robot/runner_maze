@@ -18,6 +18,8 @@ class Main:
         self.mode = None            #should pass all options and do nothing
         self.gui = GUI(self)
 
+        self.make_storage()
+
         if self.mode == 'n':
 
             self.cell_row_num = None                #will be made in self.optomize_sizes, col_num passed from GUI
@@ -150,6 +152,9 @@ class Main:
         """returns how many cells could fit in the screen given the width and col_num"""
         return self.width // self.cell_col_num        
 
+    def make_storage(self):
+        if not Path('storage').exists():
+            Path('storage').mkdir()
 
 if __name__ == "__main__":
     inst = '''\t\t**Instructions**\n

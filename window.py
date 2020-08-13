@@ -69,8 +69,8 @@ class CreateWindow(Window):
 
     def start_drawing(self):
         """method to run the drawing aspect of the program."""
-        self.running = True
-        while self.running:
+        self.drawing = True
+        while self.drawing and self.running:
             try:
                 self.update_screen()
                 self.handler.handle() 

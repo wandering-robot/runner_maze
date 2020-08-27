@@ -5,7 +5,7 @@ from maze import Maze
 from grapher import Grapher
 from gui import GUI
 
-
+import win32api as api
 import pickle       #for loading old mazes
 from pathlib import Path
 from shutil import rmtree   #to delete a preexisitng file if user wants to name a new maze by an old name
@@ -13,8 +13,8 @@ import sys      #to exit if user
 
 class Main:
     def __init__(self):
-        self.height = 750                    #starting sizes just to give the program an idea of how big we want the screen to be
-        self.width = 500
+        self.height = api.GetSystemMetrics(1)                  #starting sizes just to give the program an idea of how big we want the screen to be
+        self.width = int(self.height / 1.5)
         self.mode = None            #should pass all options and do nothing
         self.gui = GUI(self)
 

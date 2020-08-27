@@ -46,8 +46,10 @@ class Grapher:
         plt.show()
 
     def display_data(self):
-        self.x = Process(target=self._display_data,daemon=True)
-        self.x.start()
+        pass
+        # self.x = Process(target=self._display_data,daemon=True)
+        # self.x.start()
 
     def data_terminate(self):
-        self.x.join()
+        pass
+        # self.x.join()

@@ -13,9 +13,21 @@ import sys      #to exit if user
 
 class Main:
     def __init__(self):
-        self.height = api.GetSystemMetrics(1)                  #starting sizes just to give the program an idea of how big we want the screen to be
+        self.height = api.GetSystemMetrics(1) - 35                  #starting sizes just to give the program an idea of how big we want the screen to be
         self.width = int(self.height / 1.5)
+        
+        #window/mode parameters
         self.mode = None            #should pass all options and do nothing
+        self.maze_name = None
+        self.cell_col_num = None
+        self.autosave = None
+        #AI parameters
+        self.alpha = None
+        self.gamma = None
+        self.epsilon = None
+        self.lamda = None
+        self.E_eq = None
+
         self.gui = GUI(self)
 
         self.make_storage()
@@ -32,7 +44,7 @@ class Main:
             self.maze = Maze(self.cell_col_num,self.cell_row_num,self.cell_size)
             self.maze.make_state_dict()
 
-            self.grapher = Grapher(self.maze_name)
+            self.grapher = Grapher(self)
 
             #creating section
             self.window = CreateWindow(self,self.height,self.width,self.cell_size)
@@ -49,7 +61,7 @@ class Main:
 
         elif self.mode == 'd':
             self.maze = self.load_maze()
-            self.grapher = Grapher(self.maze_name)
+            self.grapher = Grapher(self)
             self.grapher.load_data()
 
             #make main object have similar attributes in both new and old cases for consistency
@@ -64,7 +76,7 @@ class Main:
         
         elif self.mode == 'r':
             self.maze = self.load_maze()
-            self.grapher = Grapher(self.maze_name)
+            self.grapher = Grapher(self)
 
             #make main object have similar attributes in both new and old cases for consistency
             self.cell_size = self.maze.cell_size

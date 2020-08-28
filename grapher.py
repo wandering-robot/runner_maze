@@ -5,8 +5,11 @@ import pickle
 
 class Grapher:
     """graphing object that is tied to the parent class window"""
-    def __init__(self,name):
-        self.maze_name = name
+    def __init__(self,main):
+        self.main = main
+        self.maze_name = self.main.maze_name
+        self.info_str = f'{self.maze_name}_A{str(self.main.alpha)[2:]}_G{str(self.main.gamma)[2:]}_E{str(self.main.epsilon)[2:]}_L{str(self.main.lamda)[2:]}_Eq{self.main.E_eq}'
+
         self.domain = []
         self.range = []
 
@@ -16,8 +19,9 @@ class Grapher:
         self.range.append(data_tup[1])
 
     def save_data(self):
-        path = Path('storage',self.maze_name) / f'{self.maze_name}_graph'
+        path = Path('storage',self.maze_name) / f'{self.info_str}_graph'
 
+        plt.title(self.info_str)
         plt.plot(self.domain,self.range)
         plt.ylabel('Steps taken')
         plt.xlabel('Episode Number')

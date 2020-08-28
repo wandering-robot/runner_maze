@@ -112,8 +112,8 @@ class NewPage(Page):
         main_button = Button(self,text='Back',command= lambda: self.gui.show_page('m'))
         main_button.grid(row=9, column=0)
         #get autosave frequency
-        autosave1_label = Label(self,text='Record progress every').grid(row=5,column=0,pady=20)
-        autosave2_lable = Label(self,text='episodes').grid(row=5, column=2)
+        Label(self,text='Record progress every').grid(row=5,column=0,pady=20)
+        Label(self,text='episodes').grid(row=5, column=2)
         self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150,borderwidth=3,relief="sunken")
         self.spinner.grid(row=5,column=1,pady=20)
         #label next to resolution slider
@@ -130,7 +130,7 @@ class NewPage(Page):
         self.slider = Scale(self, orient=HORIZONTAL, from_=3, to=12, length=125)            #set col num from 3 to 12
         self.slider.grid(row=6, column=1)
         #start button
-        start_button = Button(self,text='Start!',command=self.start_new_simulation)
+        start_button = Button(self,text='Next',command=self.start_new_simulation)
         start_button.grid(row=9,column=2)
 
     def display_availability(self,name=None):
@@ -173,7 +173,7 @@ class NewPage(Page):
             self.gui.main.cell_col_num = col_num
             self.gui.main.autosave = int(save_freq)
             self.gui.main.mode = 'n'
-            self.gui.root.destroy()
+            self.gui.show_page('a')
         else:
             label6 = Label(self, text='Enter and Check Name', justify=CENTER)
             label6.grid(row=9, column=1)
@@ -195,13 +195,13 @@ class RetrainPage(Page):
         self.selector.grid(row=3, column=1)
         self.get_options(self.selector)
         #start button
-        start_button = Button(self,text='Start!',command=self.start_retrain_simulation,)
+        start_button = Button(self,text='Next',command=self.start_retrain_simulation,)
         start_button.grid(row=5,column=2,pady=50)
         #warning label
         self.warning()
         #autosave number getter
-        autosave1_label = Label(self,text='Record progress every').grid(row=0,column=0)
-        autosave2_lable = Label(self,text='episodes').grid(row=0, column=2)
+        Label(self,text='Record progress every').grid(row=0,column=0)
+        Label(self,text='episodes').grid(row=0, column=2)
         self.spinner = Spinbox(self,from_=100,to=10000,textvariable=150,borderwidth=3,relief="sunken")
         self.spinner.grid(row=0,column=1,pady=20)
 
@@ -212,7 +212,7 @@ class RetrainPage(Page):
     def get_options(self,selector):
         """fill the selector with all the saved mazes available"""
         i=1
-        for root, dirs, files in os.walk('storage'):
+        for _, dirs, _ in os.walk('storage'):
             for name in dirs:
                 if Path('storage',name,f'{name}_maze').exists():
                     selector.insert(i,name)
@@ -234,10 +234,72 @@ class RetrainPage(Page):
             self.gui.main.maze_name = name
             self.gui.main.autosave = int(save_freq)
             self.gui.main.mode = 'r'
-            self.gui.root.destroy()
+            self.gui.show_page('a')
 
         except:
             self.warning(warn=True)
+
+class AiPage(Page):
+    def __init__(self,gui,*args,**kwargs):
+        Page.__init__(self,*args,**kwargs)
+
+        self.gui = gui
+        Label(self,text='AI Parameters').grid(row=0,column=1)
+        #alpha
+        Label(self,text='Alpha').grid(row=1,column=0)
+        self.alpha_slider = Scale(self, orient=HORIZONTAL, from_=0, to=1, length=125, resolution=0.05)    
+        self.alpha_slider.set(0.1)
+        self.alpha_slider.grid(row=1, column=1, padx=20)
+        Label(self,text='Algorithm\'s step size').grid(row=1,column=3)
+        #gamma
+        Label(self,text='Gamma').grid(row=2,column=0)
+        self.gamma_slider = Scale(self, orient=HORIZONTAL, from_=0, to=1, length=125, resolution=0.05)            
+        self.gamma_slider.set(0.75)
+        self.gamma_slider.grid(row=2, column=1, padx=20)
+        Label(self,text='Algorithm\'s discount rate').grid(row=2,column=3)
+        #epsilon
+        Label(self,text='Epsilon').grid(row=3,column=0)
+        self.epsilon_slider = Scale(self, orient=HORIZONTAL, from_=0, to=1, length=125, resolution=0.05)            
+        self.epsilon_slider.set(0.15)
+        self.epsilon_slider.grid(row=3, column=1, padx=20)
+        Label(self,text='Algorithm\'s exploration').grid(row=3,column=3)
+        #lamda
+        Label(self,text='Lamda').grid(row=4,column=0)
+        self.lamda_slider = Scale(self, orient=HORIZONTAL, from_=0, to=1, length=125, resolution=0.05)            
+        self.lamda_slider.set(0.5)
+        self.lamda_slider.grid(row=4, column=1, padx=20)
+        Label(self,text='Algorithm\'s Trace Decay').grid(row=4,column=3)
+        #E_eq
+        Label(self,text='   ').grid(row=5,column=1)
+        Label(self,text='Eligibility Trace Eq.').grid(row=6,column=0)
+        MODES = [
+        ("Accumulating Trace", "a"),
+        ("Replacing Trace", "r"),
+        ("Dutch Trace", "d"),
+        ]
+        self.E_eq = StringVar()
+        self.E_eq.set('a')
+        i=6
+        for text, mode in MODES:
+            b = Radiobutton(self, text=text,variable=self.E_eq, value=mode, justify=LEFT,anchor='nw')
+            b.grid(sticky=W, row=i, column=1,padx=20)
+            i += 1
+
+        #return to main button
+        main_button = Button(self,text='Back',command= lambda: self.gui.show_page('m'))
+        main_button.grid(row=9, column=0)
+        #start button
+        start_button = Button(self,text='Start!',command=self.start)
+        start_button.grid(row=9,column=3,pady=50)
+
+    def start(self):
+        self.gui.main.alpha = self.alpha_slider.get()
+        self.gui.main.gamma = self.gamma_slider.get()
+        self.gui.main.epsilon = self.epsilon_slider.get()
+        self.gui.main.lamda = self.lamda_slider.get()
+        self.gui.main.E_eq = self.E_eq.get()
+
+        self.gui.root.destroy()
 
 class DisplayPage(Page):
     def __init__(self,gui,*args,**kwargs):
@@ -312,14 +374,16 @@ class GUI:
         self.new = NewPage(self, padx=10, pady=75)
         self.retrain = RetrainPage(self, padx=5, pady=50)
         self.display = DisplayPage(self, padx=5, pady=75)
+        self.ai = AiPage(self,padx = 10, pady=10)
 
         self.inst.place(x=0,y=0)
         self.new.place(x=0, y=0)
         self.retrain.place(x=0, y=0)
         self.display.place(x=0, y=0)
         self.main_page.place(x=0, y=0)
+        self.ai.place(x=0, y=0)
 
-        self.pages = [self.main_page, self.new, self.retrain, self.display, self.inst]
+        self.pages = [self.main_page, self.new, self.retrain, self.display, self.inst, self.ai]
 
         self.hide_pages()
         self.main_page.show()
@@ -339,6 +403,8 @@ class GUI:
             self.display.show()
         elif var == 'i':
             self.inst.show()
+        elif var == 'a':
+            self.ai.show()
 
     def hide_pages(self):
         """moves all the pages out of view"""

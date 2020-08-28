@@ -15,9 +15,10 @@ class AI:
         self.qs = {}
         self.create_qs()
 
-        self.alpha = 0.15
-        self.gamma = 0.8
-        self.epsilon = 0.15
+        self.alpha = self.window.main.alpha
+        self.gamma = self.window.main.alpha
+        self.epsilon = self.window.main.alpha
+        self.E_eq = self.window.main.E_eq
 
         self.episode_num = 0            #to keep track of what episode we are currently on while training
 
@@ -199,7 +200,7 @@ class Runner(AI):
         state = self.window.cell_dict[self.pos]
         if not self.is_terminal():
             action = super().get_action(state)
-            state_prime, reward = super().next_state_reward(state,action)
+            state_prime, _ = super().next_state_reward(state,action)
             self.show_damage(state,state_prime)
             self.pos = state_prime.coord
         else:

@@ -2,7 +2,7 @@
 These visuals pertain to the drawing of the maze as well as the 
 showing of the agent's body completing the maze using q-values"""
 from handler import CreateHandler, RunningHandler, ShowingHandler
-from ai import BasicML, EligAI, Knowledge, Runner
+from ai import BasicML, EligML, Knowledge, Runner
 
 import pygame as py
 import pickle           #to save an AI's knowledge
@@ -79,7 +79,7 @@ class CreateWindow(Window):
 
     def start_learning(self,autosave=None):
         """method that commences with the AI's learning, showing current results on screen"""
-        self.ai = BasicML(self)
+        self.ai = EligML(self)
         self.handler = RunningHandler(self)
         self.delete_old_knowledge()             #clear out old pickeld knowledge 
         while self.running:

@@ -266,7 +266,7 @@ class AiPage(Page):
         #lamda
         Label(self,text='Lamda').grid(row=4,column=0)
         self.lamda_slider = Scale(self, orient=HORIZONTAL, from_=0, to=1, length=125, resolution=0.05)            
-        self.lamda_slider.set(0.5)
+        self.lamda_slider.set(0.8)
         self.lamda_slider.grid(row=4, column=1, padx=20)
         Label(self,text='Algorithm\'s Trace Decay').grid(row=4,column=3)
         #E_eq

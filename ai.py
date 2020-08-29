@@ -22,8 +22,6 @@ class AI:
         self.E_eq = self.window.main.E_eq
         self.eq = self.get_eq()
 
-        self.eligibles = []
-
         self.episode_num = 0            #to keep track of what episode we are currently on while training
 
     def get_eq(self):
@@ -36,7 +34,7 @@ class AI:
             return lambda x: (1-self.alpha)*self.gamma*self.lamda*x +1
 
     def run_episode(self):
-        """preforms algorithm, stops once hits terminal, returns steps taken to hit terminal"""
+        """preforms algorithm based on which subclass is loaded in the window, stops once hits terminal, returns steps taken to hit terminal"""
         steps = 0
         state = self.starting_state
         while True:
@@ -102,15 +100,45 @@ class AI:
         except:
             return state, -5            #assign -1 reward when goes off map, essentially surroounded by walls
 
-class EligAI(AI):
+class EligML(AI):
     def __init__(self,window):
         super().__init__(window)
+        self.eligibles = []
 
     def algo(self,state):
-        pass
+        """preforms the td(lambda) algorithm, returning the next state"""
+        action = self.get_action(state)
+        q = self.get_q(state,action)
+        self.make_eligible(q)
 
-    def update_q_value(self,q,q_prime,reward):
-        pass
+        state_prime, reward = self.next_state_reward(state,action)
+        action_prime = self.get_action(state_prime)
+        q_prime = self.get_q(state_prime,action_prime)
+
+        delta = reward + self.gamma*q_prime.value - q.value
+        q.elig = self.eq(q.elig)
+
+        self.distribute_reward(delta)
+        self.clean_eligibles()
+
+        return state_prime
+
+    def distribute_reward(self,delta):
+        """distributes the reward to every eligible state action pair"""
+        for q in self.eligibles:
+            q.value += self.alpha*delta*q.elig
+            q.elig = self.gamma*self.lamda*q.elig
+
+    def clean_eligibles(self):
+        """removes state action pairs form eligibles if their eligibilty drops below 0.005"""
+        for q in self.eligibles.copy():
+            if q.elig < 0.005:
+                self.eligibles.remove(q)
+
+    def make_eligible(self,q):
+        """adds a q to the eligibles list"""
+        self.eligibles.append(q)
+
 
 class BasicML(AI):
     def __init__(self,window):

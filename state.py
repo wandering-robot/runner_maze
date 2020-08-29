@@ -14,7 +14,7 @@ class State:
         self.value = None
 
     def __repr__(self):
-        return f'SC@{self.coord},V={self.value}'
+        return f'SC@{self.coord}'
 
     def add_visuals(self,size=None):
         """Method run to add the cell aspects to each state. Mostly to tell them what size they are"""
@@ -68,4 +68,16 @@ class Q:
         self.value = 0
 
     def __repr__(self):
-        return f'{self.value}'
+        if self.action[0] == 1:
+            ud = 'u'
+        elif self.action[0] == -1:
+            ud = 'd'
+        else:
+            ud = '0'
+        if self.action[1] == 1:
+            lr = 'r'
+        elif self.action[1] == -1:
+            lr = 'l'
+        else:
+            lr = '0'
+        return f'{ud}-{lr}:{self.state}'

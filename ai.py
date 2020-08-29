@@ -18,9 +18,22 @@ class AI:
         self.alpha = self.window.main.alpha
         self.gamma = self.window.main.alpha
         self.epsilon = self.window.main.alpha
+        self.lamda = self.window.main.lamda
         self.E_eq = self.window.main.E_eq
+        self.eq = self.get_eq()
+
+        self.eligibles = []
 
         self.episode_num = 0            #to keep track of what episode we are currently on while training
+
+    def get_eq(self):
+        """input is the q's eligibility, outputs q's new eligibility"""
+        if self.E_eq == 'a':
+            return lambda x: self.gamma*self.lamda*x + 1
+        elif self.E_eq == 'r':
+            return lambda x: 1
+        elif self.E_eq == 'd':
+            return lambda x: (1-self.alpha)*self.gamma*self.lamda*x +1
 
     def run_episode(self):
         """preforms algorithm, stops once hits terminal, returns steps taken to hit terminal"""
@@ -30,28 +43,9 @@ class AI:
             if state.purpose == 'finish':    #end episode if on the terminal state
                 break
             steps += 1
-            state = self.basic_ml(state)
+            state = self.algo(state)
         self.episode_num += 1
         return steps
-
-    def basic_ml(self,state):
-        """preforms the ML algorithm, returning the next state"""
-        action = self.get_action(state)
-        q = self.get_q(state,action)
-
-        state_prime, reward = self.next_state_reward(state,action)
-        action_prime = self.get_action(state_prime)
-        q_prime = self.get_q(state_prime,action_prime)
-
-        self.update_q_value(q,q_prime,reward)
-        if state != state_prime:
-            similar_qs = self.get_similar_qs(state_prime.coord,q)   #should normally do this
-        else:
-            similar_qs = self.get_similar_qs((state.coord[0]+action[0],state.coord[1]+action[1]),q) #if hits something, state stays same. need to project out-of-map/into-wall 
-        for pre_q in similar_qs:
-            self.update_q_value(pre_q,q_prime,reward)
-
-        return state_prime
 
     def create_actions(self):
         """creates list of all actions that AI can take"""
@@ -70,10 +64,6 @@ class AI:
             except:
                 continue
         return similar_qs
-
-    def update_q_value(self,q,q_prime,reward):
-        """Update rule derived from the Bellman Equation"""
-        q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
 
     def create_qs(self):
         """fill the qs dict with the state;s coord and the action as a Q's key"""
@@ -111,6 +101,44 @@ class AI:
                 return state_prime, reward
         except:
             return state, -5            #assign -1 reward when goes off map, essentially surroounded by walls
+
+class EligAI(AI):
+    def __init__(self,window):
+        super().__init__(window)
+
+    def algo(self,state):
+        pass
+
+    def update_q_value(self,q,q_prime,reward):
+        pass
+
+class BasicML(AI):
+    def __init__(self,window):
+        super().__init__(window)
+
+    def algo(self,state):
+        """preforms the ML algorithm, returning the next state"""
+        action = self.get_action(state)
+        q = self.get_q(state,action)
+
+        state_prime, reward = self.next_state_reward(state,action)
+        action_prime = self.get_action(state_prime)
+        q_prime = self.get_q(state_prime,action_prime)
+
+        self.update_q_value(q,q_prime,reward)
+        if state != state_prime:
+            similar_qs = self.get_similar_qs(state_prime.coord,q)   #should normally do this
+        else:
+            similar_qs = self.get_similar_qs((state.coord[0]+action[0],state.coord[1]+action[1]),q) #if hits something, state stays same. need to project out-of-map/into-wall 
+        for pre_q in similar_qs:
+            self.update_q_value(pre_q,q_prime,reward)
+
+        return state_prime
+
+    def update_q_value(self,q,q_prime,reward):
+        """Update rule derived from the Bellman Equation"""
+        q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
+
 
 class Knowledge:
     """will use for saving the AI's knowledge of a specific map"""

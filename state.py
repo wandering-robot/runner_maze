@@ -63,6 +63,7 @@ class Q:
     def __init__(self,state,action):
         self.state = state
         self.action = action
+        self.elig = 0
 
         self.value = 0
 

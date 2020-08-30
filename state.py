@@ -33,7 +33,7 @@ class State:
         purpose. This will update the state's reward as well."""
         self.purpose = role
         if role == 'wall':
-            self.reward = -5
+            self.reward = -2
             self.colour = (0,0,0)
         elif role == 'finish':
             self.reward = 100
@@ -59,6 +59,19 @@ class State:
         rb = 100*(log(max) - log(self.value))/(log(max) - log(min))
         self.cell.fill((rb,100,rb))
 
+class Action:
+    def __init__(self,down,right):
+        self.down = down
+        self.right = right
+        self.tup = (self.down,self.right)
+
+    def __getitem__(self,key):
+        if not isinstance(key,tuple):
+            return self.tup[key]
+
+    def __repr__(self):
+        return f'D{self.down}:R{self.right}'
+
 class Q:
     def __init__(self,state,action):
         self.state = state
@@ -68,16 +81,4 @@ class Q:
         self.value = 0
 
     def __repr__(self):
-        if self.action[0] == 1:
-            ud = 'u'
-        elif self.action[0] == -1:
-            ud = 'd'
-        else:
-            ud = '0'
-        if self.action[1] == 1:
-            lr = 'r'
-        elif self.action[1] == -1:
-            lr = 'l'
-        else:
-            lr = '0'
-        return f'{ud}-{lr}:{self.state}'
+        return f'{self.action}:{self.state}'

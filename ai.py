@@ -1,8 +1,8 @@
 """AI algorithms for learning how to solve the maze"""
-from random import randint,choice
+from random import random,choice
 import pygame as py
 
-from state import State, Q
+from state import State, Action, Q
 class AI:
     """object that learns from trial and error using RL algorithms"""
     def __init__(self,window):
@@ -16,8 +16,8 @@ class AI:
         self.create_qs()
 
         self.alpha = self.window.main.alpha
-        self.gamma = self.window.main.alpha
-        self.epsilon = self.window.main.alpha
+        self.gamma = self.window.main.gamma
+        self.epsilon = self.window.main.epsilon
         self.lamda = self.window.main.lamda
         self.E_eq = self.window.main.E_eq
         self.eq = self.get_eq()
@@ -47,7 +47,7 @@ class AI:
 
     def create_actions(self):
         """creates list of all actions that AI can take"""
-        return [(del_row,del_col) for del_row in range(-1,2) for del_col in range(-1,2) if (del_row,del_col) != (0,0)]
+        return [Action(del_row,del_col) for del_row in range(-1,2) for del_col in range(-1,2) if (del_row,del_col) != (0,0)]
 
     def get_similar_qs(self,state_coord,q):
         """returns a list other qs that would lead to that state, so
@@ -57,35 +57,63 @@ class AI:
             try:
                 pre_state = self.states[(state_coord[0] - action[0], state_coord[1] - action[1])]       #by subtracting action it goes backwards
                 pre_q = self.get_q(pre_state,action)
-                if pre_q != q:
+                if pre_q != q and pre_state.purpose == None:
                     similar_qs.append(pre_q)
             except:
                 continue
         return similar_qs
 
+    def distribute2similar(self,state,state_prime,q,q_prime,action,reward):
+        """uses get similar qs and distributes the reward to all similars"""
+        if state != state_prime:
+            similar_qs = self.get_similar_qs(state_prime.coord,q)   #should normally do this
+        else:
+            similar_qs = self.get_similar_qs((state.coord[0]+action[0],state.coord[1]+action[1]),q) #if hits something, state stays same. need to project out-of-map/into-wall 
+        for pre_q in similar_qs:
+            self.update_q_value(pre_q,q_prime,reward)
+
+    def update_q_value(self,q,q_prime,reward):
+        """Update rule derived from the Bellman Equation"""
+        q.value = q.value + self.alpha*(reward + self.gamma*q_prime.value - q.value)
+
     def create_qs(self):
         """fill the qs dict with the state;s coord and the action as a Q's key"""
         for s_coord, state in self.states.items():
             for action in self.actions:
-                self.qs[(s_coord,action)] = Q(state,action)
+                self.qs[(s_coord,action.tup)] = Q(state,action)
 
     def get_action(self,state):
         """checks all qs accessible from state and returns best one unless chooses randomly"""
         actions = self.actions[:]
-        action_values = [self.qs[(state.coord,action)].value for action in actions]
+        action_values = [self.qs[(state.coord,action.tup)].value for action in actions]
 
         max_value = max(action_values)
-        ind = action_values.index(max_value)
+        max_actions = []
+        for ind in range(len(actions)):
+            if action_values[ind] == max_value:
+                max_actions.append(actions[ind])
 
-        max_action = actions.pop(ind)
-
-        if randint(0,1) > self.epsilon:
-            return max_action
+        randnum = random()
+        if randnum > self.epsilon:
+            return choice(max_actions)
         else:
             return choice(actions)
 
+    def get_best_action(self,state):
+        """checks all qs accessible from state and returns best one unless chooses randomly"""
+        actions = self.actions[:]
+        action_values = [self.qs[(state.coord,action.tup)].value for action in actions]
+
+        max_value = max(action_values)
+        max_actions = []
+        for ind in range(len(actions)):
+            if action_values[ind] == max_value:
+                max_actions.append(actions[ind])
+
+        return choice(max_actions)
+
     def get_q(self,state,action):
-        return self.qs[(state.coord,action)]
+        return self.qs[(state.coord,action.tup)]
 
     def next_state_reward(self,state,action):
         """returns (next state, reward) given a state-action pair"""
@@ -112,9 +140,10 @@ class EligML(AI):
         self.make_eligible(q)
 
         state_prime, reward = self.next_state_reward(state,action)
-        action_prime = self.get_action(state_prime)
+        action_prime = self.get_best_action(state_prime)
         q_prime = self.get_q(state_prime,action_prime)
 
+        self.distribute2similar(state,state_prime,q,q_prime,action,reward)
         delta = reward + self.gamma*q_prime.value - q.value
         q.elig = self.eq(q.elig)
 
@@ -154,12 +183,7 @@ class BasicML(AI):
         q_prime = self.get_q(state_prime,action_prime)
 
         self.update_q_value(q,q_prime,reward)
-        if state != state_prime:
-            similar_qs = self.get_similar_qs(state_prime.coord,q)   #should normally do this
-        else:
-            similar_qs = self.get_similar_qs((state.coord[0]+action[0],state.coord[1]+action[1]),q) #if hits something, state stays same. need to project out-of-map/into-wall 
-        for pre_q in similar_qs:
-            self.update_q_value(pre_q,q_prime,reward)
+        self.distribute2similar(state,state_prime,q,q_prime,action,reward)
 
         return state_prime
 
@@ -228,7 +252,7 @@ class Runner(AI):
             if state.purpose != None:
                 continue
             actions = self.actions[:]
-            action_values = [self.qs[(state.coord,action)].value for action in actions]
+            action_values = [self.qs[(state.coord,action.tup)].value for action in actions]
             action_num = len(action_values)
 
             max_value = max(action_values)
@@ -255,7 +279,7 @@ class Runner(AI):
         """process of moving avatar to next state based on it's current maze knowledge"""
         state = self.window.cell_dict[self.pos]
         if not self.is_terminal():
-            action = super().get_action(state)
+            action = self.get_best_action(state)
             state_prime, _ = super().next_state_reward(state,action)
             self.show_damage(state,state_prime)
             self.pos = state_prime.coord

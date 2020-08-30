@@ -13,7 +13,7 @@ import sys      #to exit if user
 
 class Main:
     def __init__(self):
-        self.height = api.GetSystemMetrics(1) - 35                  #starting sizes just to give the program an idea of how big we want the screen to be
+        self.height = api.GetSystemMetrics(1) - 100                  #starting sizes just to give the program an idea of how big we want the screen to be
         self.width = int(self.height / 1.5)
         
         #window/mode parameters
